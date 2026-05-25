@@ -9,15 +9,41 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger)
 }
 
+// ─────────────────────────────────────────────
+// 3×3 BENTO GRID
+// ─────────────────────────────────────────────
+type Cell =
+  | { type: 'image'; src: string }
+  | { type: 'video'; src: string }
+  | { type: 'splash' }
+
+const gridCells: Cell[] = [
+  { type: 'image', src: '/portfolio/home/tile-01.jpg' },
+  { type: 'video', src: '/portfolio/home/tile-03.mp4' },
+  { type: 'image', src: '/portfolio/home/tile-04.jpg' },
+  { type: 'image', src: '/portfolio/home/tile-02.jpg' },
+  { type: 'splash' },
+  { type: 'image', src: '/portfolio/home/tile-06.jpg' },
+  { type: 'image', src: '/portfolio/home/tile-07.jpg' },
+  { type: 'video', src: '/portfolio/home/tile-05.mp4' },
+  { type: 'image', src: '/portfolio/home/tile-08.jpg' },
+]
+
+const REVEAL_PHRASE = "Premium creative for Utah's most ambitious brands."
+
 export default function VideoIntro() {
-  const backdropRef = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
+  const revealCenterRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const fadeOverlayRef = useRef<HTMLDivElement>(null)
-  const topTextRef = useRef<HTMLDivElement>(null)
+  const phraseRef = useRef<HTMLParagraphElement>(null)
+  const charsRef = useRef<HTMLSpanElement[]>([])
   const ctaRef = useRef<HTMLAnchorElement>(null)
+  const galleryRef = useRef<HTMLDivElement>(null)
+  const tileRefs = useRef<(HTMLDivElement | null)[]>([])
 
-  // ── SEAMLESS LOOP ──
+  // ── SEAMLESS LOOP for the splash video ──
   useEffect(() => {
     const video = videoRef.current
     const overlay = fadeOverlayRef.current
@@ -76,164 +102,319 @@ export default function VideoIntro() {
     }
   }, [])
 
-// ── CIRCLE-GROW REVEAL ──
+  // ── SCROLL ANIMATIONS ──
   useEffect(() => {
-    const backdrop = backdropRef.current
-    const panel = panelRef.current
-    const topText = topTextRef.current
-    const cta = ctaRef.current
-    if (!backdrop || !panel) return
+    const ctx = gsap.context(() => {
+      const panel = panelRef.current
+      const revealCenter = revealCenterRef.current
+      const gallery = galleryRef.current
+      const cta = ctaRef.current
+      const section = sectionRef.current
+      const chars = charsRef.current.filter(Boolean)
+      if (!panel || !revealCenter || !gallery || !section) return
 
-    backdrop.style.opacity = '0'
-    panel.style.clipPath = 'circle(0px at 50% 50%)'
+      // Initial states — scale 0 means the centerpiece is invisible
+      gsap.set(revealCenter, { scale: 0 })
+      gsap.set(chars, { opacity: 0, filter: 'blur(10px)', y: 10 })
+      if (cta) gsap.set(cta, { opacity: 0, y: 20 })
 
-    let contentRevealed = false
-    let triggerRef: ScrollTrigger | null = null
+      gallery.style.gridTemplateColumns = '0fr 1fr 0fr'
+      gallery.style.gridTemplateRows = '0fr 1fr 0fr'
+      gallery.style.gap = '0px'
+      gallery.style.padding = '0px'
 
-    // Wait a tick so Hero's pin spacer is in the DOM and measurable
-    const timer = setTimeout(() => {
-      const docHeight = document.documentElement.scrollHeight
-      const vh = window.innerHeight
-
-      // Reveal happens in the last ~25% of the page scroll
-    const start = docHeight - vh * 3  // 3 viewports from the bottom (still inside Hero's pin)
-const end = docHeight - vh * 2      // 1 viewport from the bottom
-
-      triggerRef = ScrollTrigger.create({
-        trigger: document.body,
-        start: `${start}px top`,
-        end: `${end}px top`,
-        scrub: false,
-        markers: true, // ← keep markers ON for now so we can verify
+      ScrollTrigger.create({
+  trigger: section,
+  start: 'top bottom',
+  end: 'bottom top',
+  scrub: false,
         onUpdate: (self) => {
           const progress = self.progress
 
-          const backdropOpacity = Math.min(progress / 0.3, 1)
-          backdrop.style.opacity = String(backdropOpacity)
+          // Phase boundaries
+          // 0-30%: scale-grow + char reveal
+          // 30-45%: pause showing the centerpiece
+          // 45-100%: expand into bento grid
+          const PHASE_REVEAL_END = 0.3
+          const PHASE_HOLD_END = 0.45
 
-          const circleProgress = Math.max(0, (progress - 0.2) / 0.8)
-          const radius = circleProgress * 150
-          panel.style.clipPath = `circle(${radius}vmax at 50% 50%)`
+          if (progress <= PHASE_REVEAL_END) {
+            // ── PHASE 1: Scale the centerpiece from 0 → 1, blur-reveal text ──
+            const p1 = progress / PHASE_REVEAL_END
+            const eased = 1 - Math.pow(1 - p1, 3)
 
-          if (progress > 0.8 && !contentRevealed && topText && cta) {
-            contentRevealed = true
-            gsap.to([topText, cta], {
-              y: 0,
-              opacity: 1,
-              duration: 1.2,
-              stagger: 0.2,
-              ease: 'power3.out',
+            const scale = eased
+            revealCenter.style.transform = `scale(${scale})`
+
+            // Reset to phase 1 grid state
+            gallery.style.gridTemplateColumns = '0fr 1fr 0fr'
+            gallery.style.gridTemplateRows = '0fr 1fr 0fr'
+            gallery.style.gap = '0px'
+            gallery.style.padding = '0px'
+
+            // Char-by-char blur reveal (starts when scale reaches ~50%)
+            chars.forEach((char, i) => {
+              if (!char) return
+              const charDelay = i * 0.015
+              const charStart = 0.5 + charDelay
+              const charProgress = Math.max(0, Math.min(1, (p1 - charStart) / 0.3))
+              const blur = (1 - charProgress) * 10
+              char.style.opacity = String(charProgress)
+              char.style.filter = `blur(${blur}px)`
+              char.style.transform = `translateY(${(1 - charProgress) * 10}px)`
+            })
+
+            // Hide CTA during phase 1
+            if (cta) {
+              cta.style.opacity = '0'
+              cta.style.transform = 'translateY(20px)'
+            }
+          } else if (progress <= PHASE_HOLD_END) {
+            // ── PHASE 2: Hold — centerpiece at full scale, all text visible, CTA fades in ──
+            revealCenter.style.transform = 'scale(1)'
+
+            chars.forEach((char) => {
+              if (!char) return
+              char.style.opacity = '1'
+              char.style.filter = 'blur(0px)'
+              char.style.transform = 'translateY(0px)'
+            })
+
+            // Fade CTA in during hold
+            const hold = (progress - PHASE_REVEAL_END) / (PHASE_HOLD_END - PHASE_REVEAL_END)
+            if (cta) {
+              cta.style.opacity = String(hold)
+              cta.style.transform = `translateY(${(1 - hold) * 20}px)`
+            }
+
+            // Reset grid to single cell
+            gallery.style.gridTemplateColumns = '0fr 1fr 0fr'
+            gallery.style.gridTemplateRows = '0fr 1fr 0fr'
+            gallery.style.gap = '0px'
+            gallery.style.padding = '0px'
+          } else {
+            // ── PHASE 3: Expand to 3×3 bento grid ──
+            const p3 = (progress - PHASE_HOLD_END) / (1 - PHASE_HOLD_END)
+            const eased = 1 - Math.pow(1 - p3, 3)
+
+            // Centerpiece becomes the center cell — keep at scale 1
+            revealCenter.style.transform = 'scale(1)'
+
+            // Fade chars + CTA as we transition to gallery
+            chars.forEach((char) => {
+              if (!char) return
+              char.style.opacity = String(Math.max(0, 1 - p3 * 2))
+            })
+            if (cta) cta.style.opacity = String(Math.max(0, 1 - p3 * 2))
+
+            const sideRatio = eased
+            gallery.style.gridTemplateColumns = `${sideRatio}fr 1fr ${sideRatio}fr`
+            gallery.style.gridTemplateRows = `${sideRatio}fr 1fr ${sideRatio}fr`
+            gallery.style.gap = `${eased * 12}px`
+            gallery.style.padding = `${eased * 16}px`
+
+            tileRefs.current.forEach((tile, i) => {
+              if (!tile) return
+              if (i === 4) return
+              const tileDelay = (i < 4 ? i : i - 1) * 0.04
+              const tileProgress = Math.max(0, Math.min(1, (eased - tileDelay) / 0.5))
+              tile.style.opacity = String(tileProgress)
             })
           }
         },
+        onLeave: () => {
+          panel.style.display = 'none'
+        },
+        onEnterBack: () => {
+          panel.style.display = 'block'
+        },
+        onLeaveBack: () => {
+    panel.style.display = 'none'  // hide when scrolling back above section
+  },
+
+  onToggle: (self) => {
+    // Show panel when active (in viewport), hide when not
+    panel.style.display = self.isActive ? 'block' : 'none'
+  },
       })
+    }, sectionRef)
 
-      ScrollTrigger.refresh()
-    }, 300)
-
-    if (topText && cta) {
-      gsap.set([topText, cta], { y: 30, opacity: 0 })
-    }
-
-    return () => {
-      clearTimeout(timer)
-      if (triggerRef) triggerRef.kill()
-    }
+    return () => ctx.revert()
   }, [])
 
   return (
     <>
-      {/* No scroll anchor section needed — we use body scroll position directly */}
-
-      {/* ── FIXED BACKDROP ── */}
-      <div
-        ref={backdropRef}
+      {/* ── ANCHOR SECTION — drives the scroll distance ── */}
+      <section
+        ref={sectionRef}
         style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          zIndex: 9998,
-          background: '#000',
-          pointerEvents: 'none',
-          willChange: 'opacity',
-          opacity: 0,
+          position: 'relative',
+          height: '400vh',
+          width: '100%',
+          background: 'transparent',
         }}
       />
 
-      {/* ── FIXED VIDEO PANEL ── */}
+      {/* ── PANEL — transparent backdrop, Hero's gradient shows through ── */}
       <div
         ref={panelRef}
-        className="overflow-hidden"
         style={{
           position: 'fixed',
           top: 0,
           left: 0,
           width: '100vw',
           height: '100vh',
-          zIndex: 9999,
-          willChange: 'clip-path',
-          background: '#000',
-          clipPath: 'circle(0px at 50% 50%)',
+          zIndex: 41,
+          background: 'transparent',
+          pointerEvents: 'none',
+          display: 'none', 
         }}
       >
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          className="absolute inset-0 h-full w-full object-cover"
+        {/* ── 3×3 BENTO GRID ── (kicks in during Phase 3) */}
+        <div
+          ref={galleryRef}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'grid',
+            gridTemplateColumns: '0fr 1fr 0fr',
+            gridTemplateRows: '0fr 1fr 0fr',
+            gap: '0px',
+            padding: '0px',
+            willChange: 'grid-template-columns, grid-template-rows, gap, padding',
+          }}
         >
-          <source src="/videos/bigbg.mp4" type="video/mp4" />
-        </video>
+          {gridCells.map((cell, i) => (
+            <div
+              key={i}
+              ref={(el) => {
+                tileRefs.current[i] = el
+              }}
+              style={{
+                position: 'relative',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                background: 'transparent',
+                opacity: cell.type === 'splash' ? 1 : 0,
+                willChange: 'opacity',
+                minWidth: 0,
+                minHeight: 0,
+              }}
+            >
+              {cell.type === 'splash' && (
+                <div ref={revealCenterRef} className="h-full w-full" style={{ transformOrigin: 'center center' }}>
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    muted
+                    playsInline
+                    preload="auto"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block',
+                    }}
+                  >
+                    <source src="/videos/bigbg.mp4" type="video/mp4" />
+                  </video>
 
-        <div
-          ref={fadeOverlayRef}
-          className="pointer-events-none absolute inset-0"
-          style={{
-            opacity: 0,
-            background: '#000',
-          }}
-        />
+                  <div
+                    ref={fadeOverlayRef}
+                    className="pointer-events-none absolute inset-0"
+                    style={{
+                      opacity: 0,
+                      background: '#000',
+                    }}
+                  />
 
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 70%, rgba(0,0,0,0.5) 100%)',
-          }}
-        />
+                  <div
+                    className="pointer-events-none absolute inset-0"
+                    style={{
+                      background:
+                        'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 70%, rgba(0,0,0,0.5) 100%)',
+                    }}
+                  />
+                </div>
+              )}
 
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.06] mix-blend-overlay"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-          }}
-        />
+              {cell.type === 'video' && (
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    display: 'block',
+                  }}
+                >
+                  <source src={cell.src} type="video/mp4" />
+                </video>
+              )}
 
-        {/* TOP: tiny centered text */}
-        <div
-          ref={topTextRef}
-          className="absolute left-1/2 top-10 z-10 -translate-x-1/2 text-center md:top-14"
-        >
-          <p
-            className="text-[10px] uppercase tracking-[0.35em] text-white/80 md:text-[11px]"
-            style={{ fontFamily: 'var(--font-body, system-ui)', lineHeight: 1.7 }}
-          >
-            A team of strategists,
-            <br />
-            designers, and storytellers.
-          </p>
+              {cell.type === 'image' && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={cell.src}
+                  alt=""
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    display: 'block',
+                  }}
+                />
+              )}
+            </div>
+          ))}
         </div>
 
-        {/* BOTTOM: About Us pill */}
-        <div className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2 md:bottom-14">
+        {/* ── REVEAL PHRASE — char-by-char blur defocus ── */}
+        <p
+          ref={phraseRef}
+          className="absolute left-1/2 z-[60] -translate-x-1/2 px-6 text-center"
+          style={{
+            bottom: '15%',
+            fontFamily: 'var(--font-body, sans-serif)',
+            fontSize: 'clamp(0.85rem, 1.1vw, 1.1rem)',
+            fontWeight: 500,
+            color: 'rgba(255, 255, 255, 0.95)',
+            letterSpacing: '0.3em',
+            textTransform: 'uppercase',
+            maxWidth: '900px',
+            pointerEvents: 'none',
+          }}
+        >
+          {REVEAL_PHRASE.split('').map((char, i) => (
+            <span
+              key={i}
+              ref={(el) => {
+                if (el) charsRef.current[i] = el
+              }}
+              style={{
+                display: 'inline-block',
+                whiteSpace: char === ' ' ? 'pre' : 'normal',
+                opacity: 0,
+                filter: 'blur(10px)',
+                transform: 'translateY(10px)',
+              }}
+            >
+              {char}
+            </span>
+          ))}
+        </p>
+
+        {/* ── ABOUT US CTA ── */}
+        <div className="absolute bottom-[8%] left-1/2 z-[60] -translate-x-1/2">
           <Link
             ref={ctaRef}
             href="/about"
             className="group inline-flex items-center gap-4 rounded-full border border-white/30 bg-white/10 px-8 py-3.5 text-[10px] font-medium uppercase tracking-[0.3em] text-white backdrop-blur-md transition-all duration-300 hover:border-white hover:bg-white/20 md:text-[11px]"
+            style={{ pointerEvents: 'auto' }}
           >
             About Us
             <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">
