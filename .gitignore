@@ -1,6 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# ──────────────────────────────────────────────
+# Dependencies
+# ──────────────────────────────────────────────
 /node_modules
 /.pnp
 .pnp.*
@@ -10,32 +12,127 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
+# ──────────────────────────────────────────────
+# Testing
+# ──────────────────────────────────────────────
 /coverage
 
-# next.js
+# ──────────────────────────────────────────────
+# Next.js
+# ──────────────────────────────────────────────
 /.next/
 /out/
 
-# production
+# ──────────────────────────────────────────────
+# Production
+# ──────────────────────────────────────────────
 /build
 
-# misc
+# ──────────────────────────────────────────────
+# Misc
+# ──────────────────────────────────────────────
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
 *.pem
 
-# debug
+# ──────────────────────────────────────────────
+# Debug logs
+# ──────────────────────────────────────────────
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+logs
+*.log
 
-# env files (can opt-in for committing if needed)
+# ──────────────────────────────────────────────
+# Env files & secrets
+# ──────────────────────────────────────────────
 .env*
+*.key
+*.crt
+secrets.json
+credentials.json
+service-account*.json
 
-# vercel
+# ──────────────────────────────────────────────
+# Vercel
+# ──────────────────────────────────────────────
 .vercel
 
-# typescript
+# ──────────────────────────────────────────────
+# TypeScript
+# ──────────────────────────────────────────────
 *.tsbuildinfo
 next-env.d.ts
+
+# ──────────────────────────────────────────────
+# Media — videos (belong on a CDN, not Git)
+# ──────────────────────────────────────────────
+public/videos/
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+*.flv
+*.wmv
+*.m4v
+*.3gp
+
+# ──────────────────────────────────────────────
+# Media — large image folders
+# ──────────────────────────────────────────────
+public/portfolio/
+public/images/large/
+
+# Common heavy / source design image formats anywhere
+*.psd
+*.ai
+*.sketch
+*.fig
+*.xd
+*.tiff
+*.tif
+
+# ──────────────────────────────────────────────
+# Audio
+# ──────────────────────────────────────────────
+public/audio/
+*.mp3
+*.wav
+*.aiff
+*.flac
+*.aac
+*.ogg
+
+# ──────────────────────────────────────────────
+# Editor / IDE
+# ──────────────────────────────────────────────
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+
+# ──────────────────────────────────────────────
+# Caches
+# ──────────────────────────────────────────────
+.cache
+.parcel-cache
+.turbo
+*.bak
+*.tmp
+*.temp
