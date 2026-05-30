@@ -1,13 +1,11 @@
-import Hero from '@/components/home/Hero'
-import VideoIntro from '@/components/home/VideoIntro'
-import Testimonials from '@/components/home/Testimonials'
+import HomeExperience from '@/components/home/HomeExperience'
+import AboutReveal from '@/components/home/AboutReveal'
 
 export default function Home() {
   return (
-    <main className="relative" style={{ background: '#020617' }}>
-      <Hero />
-      <VideoIntro />
-      <Testimonials />
+    <main className="relative">
+      <HomeExperience />
+      <AboutReveal />
     </main>
   )
 }

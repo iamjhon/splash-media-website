@@ -1,0 +1,190 @@
+.bound {
+  position: relative;
+  width: 100%;
+  height: 500vh;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+}
+
+/* Splash blue gradient (matches hero) */
+.bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 30% 20%, #5eb8f5 0%, transparent 50%),
+    radial-gradient(circle at 70% 80%, #2563eb 0%, transparent 55%),
+    linear-gradient(160deg, #1e6fc4 0%, #1559a0 50%, #0e4a85 100%);
+}
+
+.video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+
+}
+
+/* Title overlay — centered vertically */
+.titleOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  pointer-events: none;
+}
+
+.eyebrow {
+  font-family: var(--font-narrow, system-ui), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.eyebrowLine {
+  display: inline-block;
+  width: 32px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.titleBig {
+  font-family: var(--font-display, system-ui), sans-serif;
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  color: #fff;
+  margin: 0;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Passion content — center stage, fades in after title fades */
+.passion {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.passionTitle {
+  font-family: var(--font-display, system-ui), sans-serif;
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: #fff;
+  margin: 0 0 1.5rem;
+  max-width: 28ch;
+  text-shadow: 0 3px 20px rgba(0, 0, 0, 0.5);
+}
+
+.passionText {
+  font-family: var(--font-body, system-ui), sans-serif;
+  font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.95);
+  max-width: 58ch;
+  margin: 0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+.buttonWrap {
+  margin-top: 2rem;
+  pointer-events: auto;
+}
+
+/* Mission / Reputation third section */
+.mission {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.missionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  max-width: 1000px;
+  width: 100%;
+  margin-bottom: 2.5rem;
+}
+
+@media (max-width: 768px) {
+  .missionGrid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.missionBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  text-align: left;
+}
+
+.missionLabel {
+  font-family: var(--font-narrow, system-ui), sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.missionTitle {
+  font-family: var(--font-display, system-ui), sans-serif;
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #fff;
+  margin: 0;
+  text-shadow: 0 3px 20px rgba(0, 0, 0, 0.4);
+}
+
+.missionText {
+  font-family: var(--font-body, system-ui), sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}

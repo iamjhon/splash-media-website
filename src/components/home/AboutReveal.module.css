@@ -1,0 +1,116 @@
+.section {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Video fills the section */
+.video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+/* White overlay with logo-shaped hole.
+   The SVG mask makes the logo area transparent (video shows)
+   and keeps everything else white. We scale THIS up on scroll. */
+.maskLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #ffffff;
+  /* mask references the inline SVG below */
+  -webkit-mask-image: var(--mask-url);
+  mask-image: var(--mask-url);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  mask-mode: alpha;
+  -webkit-mask-mode: alpha;
+  will-change: transform;
+  transform-origin: 49% 56%;
+}
+
+/* Mission / Reputation content — fades in after reveal */
+.content {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 2rem;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.blocks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  max-width: 900px;
+}
+
+@media (max-width: 768px) {
+  .blocks {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.blockTitle {
+  font-family: var(--font-display, system-ui), sans-serif;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #fff;
+  margin: 0;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+}
+
+.blockText {
+  font-family: var(--font-body, system-ui), sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+}
+
+.buttons {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Dark scrim over the video so white text is readable */
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    180deg,
+    rgba(2, 20, 40, 0.25) 0%,
+    rgba(2, 20, 40, 0.55) 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+}

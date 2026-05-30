@@ -9,9 +9,6 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger)
 }
 
-// ─────────────────────────────────────────────
-// 3×3 BENTO GRID
-// ─────────────────────────────────────────────
 type Cell =
   | { type: 'image'; src: string }
   | { type: 'video'; src: string }
@@ -43,7 +40,6 @@ export default function VideoIntro() {
   const galleryRef = useRef<HTMLDivElement>(null)
   const tileRefs = useRef<(HTMLDivElement | null)[]>([])
 
-  // ── SEAMLESS LOOP for the splash video ──
   useEffect(() => {
     const video = videoRef.current
     const overlay = fadeOverlayRef.current
@@ -102,7 +98,6 @@ export default function VideoIntro() {
     }
   }, [])
 
-  // ── SCROLL ANIMATIONS ──
   useEffect(() => {
     const ctx = gsap.context(() => {
       const panel = panelRef.current
@@ -113,7 +108,6 @@ export default function VideoIntro() {
       const chars = charsRef.current.filter(Boolean)
       if (!panel || !revealCenter || !gallery || !section) return
 
-      // Initial states — scale 0 means the centerpiece is invisible
       gsap.set(revealCenter, { scale: 0 })
       gsap.set(chars, { opacity: 0, filter: 'blur(10px)', y: 10 })
       if (cta) gsap.set(cta, { opacity: 0, y: 20 })
@@ -124,35 +118,30 @@ export default function VideoIntro() {
       gallery.style.padding = '0px'
 
       ScrollTrigger.create({
-  trigger: section,
-  start: 'top bottom',
-  end: 'bottom top',
-  scrub: false,
+        trigger: section,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: false,
+        onToggle: (self) => {
+          panel.style.display = self.isActive ? 'block' : 'none'
+        },
         onUpdate: (self) => {
           const progress = self.progress
 
-          // Phase boundaries
-          // 0-30%: scale-grow + char reveal
-          // 30-45%: pause showing the centerpiece
-          // 45-100%: expand into bento grid
           const PHASE_REVEAL_END = 0.3
           const PHASE_HOLD_END = 0.45
 
           if (progress <= PHASE_REVEAL_END) {
-            // ── PHASE 1: Scale the centerpiece from 0 → 1, blur-reveal text ──
             const p1 = progress / PHASE_REVEAL_END
             const eased = 1 - Math.pow(1 - p1, 3)
 
-            const scale = eased
-            revealCenter.style.transform = `scale(${scale})`
+            revealCenter.style.transform = `scale(${eased})`
 
-            // Reset to phase 1 grid state
             gallery.style.gridTemplateColumns = '0fr 1fr 0fr'
             gallery.style.gridTemplateRows = '0fr 1fr 0fr'
             gallery.style.gap = '0px'
             gallery.style.padding = '0px'
 
-            // Char-by-char blur reveal (starts when scale reaches ~50%)
             chars.forEach((char, i) => {
               if (!char) return
               const charDelay = i * 0.015
@@ -164,13 +153,11 @@ export default function VideoIntro() {
               char.style.transform = `translateY(${(1 - charProgress) * 10}px)`
             })
 
-            // Hide CTA during phase 1
             if (cta) {
               cta.style.opacity = '0'
               cta.style.transform = 'translateY(20px)'
             }
           } else if (progress <= PHASE_HOLD_END) {
-            // ── PHASE 2: Hold — centerpiece at full scale, all text visible, CTA fades in ──
             revealCenter.style.transform = 'scale(1)'
 
             chars.forEach((char) => {
@@ -180,27 +167,22 @@ export default function VideoIntro() {
               char.style.transform = 'translateY(0px)'
             })
 
-            // Fade CTA in during hold
             const hold = (progress - PHASE_REVEAL_END) / (PHASE_HOLD_END - PHASE_REVEAL_END)
             if (cta) {
               cta.style.opacity = String(hold)
               cta.style.transform = `translateY(${(1 - hold) * 20}px)`
             }
 
-            // Reset grid to single cell
             gallery.style.gridTemplateColumns = '0fr 1fr 0fr'
             gallery.style.gridTemplateRows = '0fr 1fr 0fr'
             gallery.style.gap = '0px'
             gallery.style.padding = '0px'
           } else {
-            // ── PHASE 3: Expand to 3×3 bento grid ──
             const p3 = (progress - PHASE_HOLD_END) / (1 - PHASE_HOLD_END)
             const eased = 1 - Math.pow(1 - p3, 3)
 
-            // Centerpiece becomes the center cell — keep at scale 1
             revealCenter.style.transform = 'scale(1)'
 
-            // Fade chars + CTA as we transition to gallery
             chars.forEach((char) => {
               if (!char) return
               char.style.opacity = String(Math.max(0, 1 - p3 * 2))
@@ -222,21 +204,9 @@ export default function VideoIntro() {
             })
           }
         },
-        onLeave: () => {
-          panel.style.display = 'none'
-        },
-        onEnterBack: () => {
-          panel.style.display = 'block'
-        },
-        onLeaveBack: () => {
-    panel.style.display = 'none'  // hide when scrolling back above section
-  },
-
-  onToggle: (self) => {
-    // Show panel when active (in viewport), hide when not
-    panel.style.display = self.isActive ? 'block' : 'none'
-  },
       })
+
+      panel.style.display = 'none'
     }, sectionRef)
 
     return () => ctx.revert()
@@ -244,7 +214,6 @@ export default function VideoIntro() {
 
   return (
     <>
-      {/* ── ANCHOR SECTION — drives the scroll distance ── */}
       <section
         ref={sectionRef}
         style={{
@@ -255,7 +224,6 @@ export default function VideoIntro() {
         }}
       />
 
-      {/* ── PANEL — transparent backdrop, Hero's gradient shows through ── */}
       <div
         ref={panelRef}
         style={{
@@ -267,10 +235,9 @@ export default function VideoIntro() {
           zIndex: 41,
           background: 'transparent',
           pointerEvents: 'none',
-          display: 'none', 
+          display: 'none',
         }}
       >
-        {/* ── 3×3 BENTO GRID ── (kicks in during Phase 3) */}
         <div
           ref={galleryRef}
           style={{
@@ -302,7 +269,11 @@ export default function VideoIntro() {
               }}
             >
               {cell.type === 'splash' && (
-                <div ref={revealCenterRef} className="h-full w-full" style={{ transformOrigin: 'center center' }}>
+                <div
+                  ref={revealCenterRef}
+                  className="h-full w-full"
+                  style={{ transformOrigin: 'center center' }}
+                >
                   <video
                     ref={videoRef}
                     autoPlay
@@ -373,7 +344,6 @@ export default function VideoIntro() {
           ))}
         </div>
 
-        {/* ── REVEAL PHRASE — char-by-char blur defocus ── */}
         <p
           ref={phraseRef}
           className="absolute left-1/2 z-[60] -translate-x-1/2 px-6 text-center"
@@ -408,7 +378,6 @@ export default function VideoIntro() {
           ))}
         </p>
 
-        {/* ── ABOUT US CTA ── */}
         <div className="absolute bottom-[8%] left-1/2 z-[60] -translate-x-1/2">
           <Link
             ref={ctaRef}

@@ -8,132 +8,255 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger)
 }
 
-// ─────────────────────────────────────────────
-// TESTIMONIAL DATA
-// Each card gets its own accent color for personality
-// ─────────────────────────────────────────────
 type Testimonial = {
+  index: string
   quote: string
   name: string
-  role?: string
+  role: string
   initials: string
-  accentColor: string
-  cardBg: string
+  accent: string
 }
 
 const testimonials: Testimonial[] = [
   {
+    index: '01',
     quote:
-      "You won't find a better team than Splash Media to work with when it comes to making your event special. Randy and his amazing staff are some of the hardest working people I've ever met. Give them a shot, you won't be disappointed — and tell them, Big T Bailey sent ya.",
+      'Splash Media transformed how our nonprofit reaches the community. Their strategy moves the needle every quarter — and they make it feel effortless.',
     name: 'Thurl Bailey',
     role: 'NBA Champion · Salt Lake Legend',
     initials: 'TB',
-    accentColor: '#5eb8f5',
-    cardBg: 'linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%)',
+    accent: '#60a5fa', // matches electric blue morph
   },
   {
+    index: '02',
     quote:
-      "I have been using Splash Media for my business for years and they've done an awesome job with several different products and projects. I highly recommend Randy and his team!",
+      'I needed a marketing partner who understands the legal industry — Splash Media delivered. Their campaigns brought in qualified leads from day one.',
     name: 'Marlene Gonzalez',
     role: 'Attorney',
     initials: 'MG',
-    accentColor: '#f472b6',
-    cardBg: 'linear-gradient(135deg, #db2777 0%, #831843 100%)',
+    accent: '#f472b6', // matches deep magenta morph
   },
   {
+    index: '03',
     quote:
-      'The Utah chapter had the pleasure to have Splash Media as one of the sponsors for our 4th Annual Event at Utah Capitol South Square. A global non-profit organization with 89 chapters across 30 countries — and they delivered.',
+      'Working with Splash Media has elevated our brand on a national scale. They understand our mission and translate it into work that resonates.',
     name: 'GFCBW Utah',
-    role: 'Chinese Business Women · Global Federation',
+    role: 'Chinese Business Women Global Federation',
     initials: 'GF',
-    accentColor: '#14b8a6',
-    cardBg: 'linear-gradient(135deg, #0d9488 0%, #064e3b 100%)',
+    accent: '#2dd4bf', // matches teal morph
   },
 ]
 
-const HEADLINE = 'What our partners say about working with us.'
+// ─────────────────────────────────────────────
+// HEADER WITH CHAR REVEAL
+// ─────────────────────────────────────────────
+const HEADING_TEXT = 'What our partners say about working with us.'
 
-export default function Testimonials() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const headlineRef = useRef<HTMLHeadingElement>(null)
+const TestimonialsHeader = () => {
   const charsRef = useRef<HTMLSpanElement[]>([])
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([])
-  const cardWrapRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      if (!sectionRef.current || !cardWrapRef.current) return
-
-      const chars = charsRef.current.filter(Boolean)
-      const cards = cardsRef.current.filter(Boolean) as HTMLDivElement[]
-
-      gsap.set(chars, { opacity: 0.12 })
-      cards.forEach((card, i) => {
-        if (!card) return
-        gsap.set(card, {
-          yPercent: 130 + i * 8,
-          opacity: 0,
-          rotation: i === 0 ? -1.5 : i === 1 ? 1 : -0.5,
-        })
-      })
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          // Fire earlier so transition from VideoIntro is seamless
-          start: 'top top',
-          end: '+=500%',
-          scrub: 1,
-          pin: true,
-          anticipatePin: 1,
-          pinSpacing: true,
-        },
-      })
-
-      // ── PHASE 1: short delay then headline reveal ──
-      // (Lets VideoIntro fully transition out)
-      tl.to({}, { duration: 0.3 })
-
-      // Character reveal
-      tl.to(
-        chars,
+      gsap.fromTo(
+        charsRef.current,
+        { opacity: 0.12, y: 0 },
         {
           opacity: 1,
-          stagger: { each: 0.04, from: 'start' },
-          ease: 'none',
-          duration: 0.4,
-        },
-        '>'
-      )
-
-      // Pause to let viewer enjoy the headline
-      tl.to({}, { duration: 0.2 })
-
-      // ── PHASE 2: Cards stack ──
-      cards.forEach((card, i) => {
-        const cardOffset = i * 50
-        const scaleDown = 1 - (cards.length - 1 - i) * 0.04
-
-        tl.to(
-          card,
-          {
-            y: cardOffset,
-            yPercent: 0,
-            opacity: 1,
-            scale: scaleDown,
-            rotation: 0,
-            ease: 'power3.out',
-            duration: 0.6,
+          duration: 0.8,
+          stagger: 0.018,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: 'top 75%',
+            end: 'bottom 50%',
+            scrub: 1,
           },
-          '>0.05'
-        )
-
-        if (i < cards.length - 1) {
-          tl.to({}, { duration: 0.25 })
         }
-      })
+      )
+    }, headerRef)
 
-      tl.to({}, { duration: 0.4 })
+    return () => ctx.revert()
+  }, [])
+
+  return (
+    <div ref={headerRef} className="mx-auto max-w-5xl px-6 pt-32 pb-20 text-center md:pt-40 md:pb-24">
+      <p className="mb-6 text-[10px] font-medium uppercase tracking-[0.4em] text-white/60 md:text-[11px]">
+        <span className="inline-block h-px w-8 align-middle bg-white/40 mr-3" />
+        Testimonials
+        <span className="inline-block h-px w-8 align-middle bg-white/40 ml-3" />
+      </p>
+      <h2
+        className="text-balance leading-[1.05] text-white"
+        style={{
+          fontFamily: 'var(--font-display, sans-serif)',
+          fontSize: 'clamp(2.5rem, 5vw, 5.5rem)',
+          fontWeight: 700,
+          letterSpacing: '-0.02em',
+        }}
+      >
+        {HEADING_TEXT.split('').map((char, i) => (
+          <span
+            key={i}
+            ref={(el) => {
+              if (el) charsRef.current[i] = el
+            }}
+            style={{
+              display: 'inline-block',
+              whiteSpace: char === ' ' ? 'pre' : 'normal',
+              opacity: 0.12,
+            }}
+          >
+            {char}
+          </span>
+        ))}
+      </h2>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────
+// SINGLE TESTIMONIAL CARD
+// ─────────────────────────────────────────────
+const TestimonialCard = ({
+  testimonial,
+  total,
+  cardRef,
+}: {
+  testimonial: Testimonial
+  total: number
+  cardRef: React.RefObject<HTMLDivElement | null>
+}) => {
+  return (
+    <div
+      ref={cardRef}
+      className="relative mx-auto mb-32 w-full max-w-5xl overflow-hidden rounded-3xl border border-white/10 px-8 py-12 backdrop-blur-md md:px-14 md:py-16"
+      style={{
+        background:
+          'linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)',
+        boxShadow:
+          '0 30px 80px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)',
+      }}
+    >
+      {/* Massive index number behind */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute right-6 top-2 select-none md:right-10 md:top-4"
+        style={{
+          fontFamily: 'var(--font-display, sans-serif)',
+          fontSize: 'clamp(7rem, 13vw, 13rem)',
+          fontWeight: 700,
+          color: 'rgba(255, 255, 255, 0.04)',
+          letterSpacing: '-0.04em',
+          lineHeight: 0.85,
+        }}
+      >
+        {testimonial.index}
+        <span style={{ fontSize: '0.45em', opacity: 0.6 }}> / 0{total}</span>
+      </span>
+
+      <div className="relative z-10 grid gap-8 md:grid-cols-[1.4fr_1fr] md:gap-12">
+        {/* QUOTE */}
+        <div>
+          <span
+            aria-hidden
+            className="block text-[6rem] leading-none"
+            style={{
+              fontFamily: 'var(--font-display, sans-serif)',
+              color: testimonial.accent,
+              opacity: 0.65,
+              marginTop: '-2rem',
+              marginBottom: '-2rem',
+            }}
+          >
+            “
+          </span>
+          <p
+            className="text-balance text-xl italic leading-snug text-white/95 md:text-2xl"
+            style={{ fontFamily: 'var(--font-body, serif)' }}
+          >
+            {testimonial.quote}
+          </p>
+        </div>
+
+        {/* ATTRIBUTION */}
+        <div className="flex flex-col items-start gap-5 md:items-end md:text-right">
+          <div className="flex items-center gap-4 md:flex-row-reverse">
+            <div
+              className="flex h-14 w-14 items-center justify-center rounded-full text-sm font-medium text-white md:h-16 md:w-16 md:text-base"
+              style={{
+                background: `linear-gradient(135deg, ${testimonial.accent}AA 0%, ${testimonial.accent}33 100%)`,
+                border: `1px solid ${testimonial.accent}66`,
+                fontFamily: 'var(--font-narrow, sans-serif)',
+                letterSpacing: '0.05em',
+              }}
+            >
+              {testimonial.initials}
+            </div>
+
+            <div className="flex flex-col md:items-end">
+              <p
+                className="text-base font-medium uppercase tracking-[0.15em] text-white md:text-lg"
+                style={{ fontFamily: 'var(--font-narrow, sans-serif)' }}
+              >
+                {testimonial.name}
+              </p>
+              <p
+                className="text-[11px] uppercase tracking-[0.25em] text-white/55 md:text-xs"
+                style={{ fontFamily: 'var(--font-body, sans-serif)' }}
+              >
+                {testimonial.role}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-1" style={{ color: testimonial.accent }}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <span key={i} className="text-lg">★</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────
+// TESTIMONIALS SECTION
+// ─────────────────────────────────────────────
+export default function Testimonials() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const card1Ref = useRef<HTMLDivElement | null>(null)
+  const card2Ref = useRef<HTMLDivElement | null>(null)
+  const card3Ref = useRef<HTMLDivElement | null>(null)
+
+  // Each card slides up + rotates slightly on entrance
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const cards = [card1Ref.current, card2Ref.current, card3Ref.current].filter(Boolean)
+      const rotations = [-1.5, 1, -0.5]
+
+      cards.forEach((card, i) => {
+        if (!card) return
+
+        gsap.fromTo(
+          card,
+          { y: 120, opacity: 0, rotate: rotations[i] * 2 },
+          {
+            y: 0,
+            opacity: 1,
+            rotate: rotations[i],
+            duration: 1.2,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: card,
+              start: 'top 75%',
+              end: 'top 40%',
+              scrub: 1.2,
+            },
+          }
+        )
+      })
     }, sectionRef)
 
     return () => ctx.revert()
@@ -142,251 +265,16 @@ export default function Testimonials() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-screen w-full overflow-hidden"
-      style={{
-        background: `
-          radial-gradient(circle at 25% 20%, #5eb8f5 0%, transparent 45%),
-          radial-gradient(circle at 75% 80%, #1e88e5 0%, transparent 50%),
-          radial-gradient(circle at 50% 50%, #2563eb 0%, transparent 55%),
-          radial-gradient(circle at 15% 75%, #0ea5e9 0%, transparent 45%),
-          linear-gradient(135deg, #0a3a6f 0%, #0e4a85 50%, #082752 100%)
-        `,
-      }}
+      className="relative w-full pb-32 md:pb-40"
+      style={{ background: 'transparent' }}
     >
-      {/* Floating accent circles for visual interest */}
-      <div
-        className="pointer-events-none absolute -left-32 top-20 h-96 w-96 rounded-full opacity-30 blur-3xl"
-        style={{ background: 'radial-gradient(circle, #f472b6 0%, transparent 70%)' }}
-      />
-      <div
-        className="pointer-events-none absolute -right-32 bottom-20 h-96 w-96 rounded-full opacity-25 blur-3xl"
-        style={{ background: 'radial-gradient(circle, #14b8a6 0%, transparent 70%)' }}
-      />
+      <TestimonialsHeader />
 
-      {/* ── EYEBROW + BIG HEADLINE ── */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-6 md:px-16">
-        <p
-          className="mb-8 text-[10px] uppercase tracking-[0.4em] text-white/60 md:mb-12 md:text-[12px]"
-          style={{ fontFamily: 'var(--font-narrow, sans-serif)' }}
-        >
-          ◊ Testimonials ◊
-        </p>
-
-        <h2
-          ref={headlineRef}
-          className="max-w-6xl text-balance text-center"
-          style={{
-            fontFamily: 'var(--font-display, var(--font-heading))',
-            fontSize: 'clamp(2.5rem, 6.5vw, 6.5rem)',
-            fontWeight: 700,
-            lineHeight: 1.02,
-            letterSpacing: '-0.03em',
-            color: '#ffffff',
-            textTransform: 'uppercase',
-          }}
-        >
-          {HEADLINE.split('').map((char, i) => (
-            <span
-              key={i}
-              ref={(el) => {
-                if (el) charsRef.current[i] = el
-              }}
-              style={{
-                display: 'inline-block',
-                whiteSpace: char === ' ' ? 'pre' : 'normal',
-              }}
-            >
-              {char}
-            </span>
-          ))}
-        </h2>
-      </div>
-
-      {/* ── STACKING CARDS ── */}
-      <div
-        ref={cardWrapRef}
-        className="absolute inset-0 flex items-center justify-center px-4 md:px-8"
-        style={{ pointerEvents: 'none' }}
-      >
-        <div
-          className="relative w-full"
-          style={{
-            maxWidth: 'min(95vw, 1100px)',
-            height: 'min(75vh, 580px)',
-          }}
-        >
-          {testimonials.map((t, i) => (
-            <TestimonialCard
-              key={i}
-              ref={(el) => {
-                cardsRef.current[i] = el
-              }}
-              testimonial={t}
-              index={i}
-              zIndex={10 + i}
-            />
-          ))}
-        </div>
+      <div className="px-4 md:px-6">
+        <TestimonialCard testimonial={testimonials[0]} total={testimonials.length} cardRef={card1Ref} />
+        <TestimonialCard testimonial={testimonials[1]} total={testimonials.length} cardRef={card2Ref} />
+        <TestimonialCard testimonial={testimonials[2]} total={testimonials.length} cardRef={card3Ref} />
       </div>
     </section>
-  )
-}
-
-// ─────────────────────────────────────────────
-// EDITORIAL CARD — bigger, asymmetric, modern
-// ─────────────────────────────────────────────
-type CardProps = {
-  testimonial: Testimonial
-  index: number
-  zIndex: number
-}
-
-const TestimonialCard = ({
-  ref,
-  testimonial: t,
-  index,
-  zIndex,
-}: CardProps & { ref: (el: HTMLDivElement | null) => void }) => {
-  return (
-    <div
-      ref={ref}
-      className="absolute inset-0 grid overflow-hidden rounded-3xl md:grid-cols-[1.4fr_1fr]"
-      style={{
-        zIndex,
-        background: t.cardBg,
-        boxShadow:
-          '0 -30px 60px -20px rgba(0, 0, 0, 0.5), 0 30px 80px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08) inset',
-        pointerEvents: 'auto',
-      }}
-    >
-      {/* Decorative pattern overlay */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cpattern id='p' x='0' y='0' width='40' height='40' patternUnits='userSpaceOnUse'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23fff'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23p)'/%3E%3C/svg%3E")`,
-        }}
-      />
-
-      {/* ── LEFT: Quote ── */}
-      <div className="relative flex flex-col justify-between p-8 md:p-12 lg:p-16">
-        {/* Massive index number */}
-        <div
-          aria-hidden
-          className="mb-6 flex items-baseline gap-4"
-          style={{
-            fontFamily: 'var(--font-display, sans-serif)',
-            color: 'rgba(255, 255, 255, 0.3)',
-          }}
-        >
-          <span
-            style={{
-              fontSize: 'clamp(3rem, 6vw, 5rem)',
-              fontWeight: 700,
-              lineHeight: 1,
-              letterSpacing: '-0.03em',
-            }}
-          >
-            0{index + 1}
-          </span>
-          <span
-            className="text-[10px] uppercase tracking-[0.3em]"
-            style={{ color: 'rgba(255, 255, 255, 0.5)' }}
-          >
-            / 0{testimonials.length}
-          </span>
-        </div>
-
-        {/* Quote text */}
-        <p
-          className="text-balance"
-          style={{
-            fontFamily: 'var(--font-display, sans-serif)',
-            fontSize: 'clamp(1.1rem, 1.9vw, 1.75rem)',
-            lineHeight: 1.3,
-            color: '#ffffff',
-            fontWeight: 500,
-            letterSpacing: '-0.015em',
-          }}
-        >
-          &ldquo;{t.quote}&rdquo;
-        </p>
-
-        {/* Decorative line */}
-        <div className="mt-8 h-px w-16" style={{ background: t.accentColor }} />
-      </div>
-
-      {/* ── RIGHT: Attribution panel ── */}
-      <div
-        className="relative flex flex-col items-start justify-between p-8 md:p-12 lg:p-16"
-        style={{
-          background: 'rgba(0, 0, 0, 0.18)',
-          borderLeft: '1px solid rgba(255, 255, 255, 0.08)',
-        }}
-      >
-        {/* Avatar with initials */}
-        <div
-          className="flex h-20 w-20 items-center justify-center rounded-full md:h-24 md:w-24"
-          style={{
-            background: t.accentColor,
-            fontFamily: 'var(--font-display, sans-serif)',
-            fontSize: '1.5rem',
-            fontWeight: 700,
-            color: '#0a1a2e',
-            letterSpacing: '-0.02em',
-            boxShadow: `0 8px 24px ${t.accentColor}40`,
-          }}
-        >
-          {t.initials}
-        </div>
-
-        {/* Name + role */}
-        <div className="mt-auto w-full">
-          <p
-            style={{
-              fontFamily: 'var(--font-display, sans-serif)',
-              fontSize: 'clamp(1.4rem, 2.2vw, 2rem)',
-              fontWeight: 700,
-              color: '#ffffff',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.05,
-              textTransform: 'uppercase',
-              margin: 0,
-            }}
-          >
-            {t.name}
-          </p>
-          {t.role && (
-            <p
-              style={{
-                fontFamily: 'var(--font-narrow, sans-serif)',
-                fontSize: '0.75rem',
-                color: 'rgba(255, 255, 255, 0.7)',
-                letterSpacing: '0.15em',
-                marginTop: '8px',
-                textTransform: 'uppercase',
-              }}
-            >
-              {t.role}
-            </p>
-          )}
-
-          {/* Star rating */}
-          <div className="mt-4 flex gap-1">
-            {[0, 1, 2, 3, 4].map((s) => (
-              <svg
-                key={s}
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill={t.accentColor}
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M12 .587l3.668 7.568L24 9.75l-6 5.848 1.416 8.268L12 19.771l-7.416 3.895L6 15.598 0 9.75l8.332-1.595z" />
-              </svg>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
   )
 }

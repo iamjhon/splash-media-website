@@ -1,0 +1,193 @@
+.glassButton {
+  --radius: 999px;
+  --blur: 28px;
+  --border-width: 1.5px;
+  --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --glass-from: rgba(255, 255, 255, 0.08);
+  --glass-to: rgba(255, 255, 255, 0.03);
+  --glass-hover-from: rgba(255, 255, 255, 0.16);
+  --glass-hover-to: rgba(255, 255, 255, 0.06);
+  --x: 50%;
+  --y: 50%;
+
+  /* These are overridden per-variant via inline style */
+  --border-grad: rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.45);
+  --glow1: rgba(255, 255, 255, 0.2);
+  --glow2: rgba(255, 255, 255, 0.12);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 40px;
+  font-family: var(--font-narrow, system-ui), sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  color: #fff;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--glass-from), var(--glass-to));
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition),
+    background var(--transition);
+}
+
+.fullWidth {
+  display: flex;
+  width: 100%;
+}
+
+/* Size variants */
+.sizeSm {
+  padding: 12px 28px;
+  font-size: 0.85rem;
+}
+.sizeMd {
+  padding: 16px 40px;
+  font-size: 1rem;
+}
+.sizeLg {
+  padding: 20px 52px;
+  font-size: 1.15rem;
+}
+
+/* Animated flowing gradient border */
+.glassButton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: var(--border-width);
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--border-grad));
+  background-size: 200% 200%;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.55;
+  animation: borderFlow 3s linear infinite;
+  transition: opacity var(--transition);
+  pointer-events: none;
+}
+
+/* Cursor-following radial highlight */
+.glassButton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at var(--x) var(--y),
+    rgba(255, 255, 255, 0.22),
+    transparent 55%
+  );
+  opacity: 0;
+  transition: opacity var(--transition);
+  pointer-events: none;
+}
+
+.glassButton:hover {
+  background: linear-gradient(
+    135deg,
+    var(--glass-hover-from),
+    var(--glass-hover-to)
+  );
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    0 14px 50px var(--glow1),
+    0 0 80px var(--glow2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glassButton:hover::before {
+  opacity: 1;
+  animation-duration: 2s;
+}
+
+.glassButton:hover::after {
+  opacity: 1;
+}
+
+.glassButton:active {
+  transform: translateY(-1px) scale(0.99);
+  box-shadow:
+    0 6px 24px var(--glow1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.label {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  transition: transform var(--transition);
+}
+
+.glassButton:hover .icon {
+  transform: translateX(3px);
+}
+
+/* Shimmer sweep */
+.shimmer {
+  position: absolute;
+  inset: -60%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.12),
+    rgba(255, 255, 255, 0.35),
+    rgba(255, 255, 255, 0.12),
+    transparent
+  );
+  transform: translateX(-100%) rotate(30deg);
+  animation: shimmer 5s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glassButton:hover .shimmer {
+  animation-duration: 1.5s;
+}
+
+@keyframes borderFlow {
+  to {
+    background-position: 200% 50%;
+  }
+}
+
+@keyframes shimmer {
+  to {
+    transform: translateX(100%) rotate(30deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glassButton,
+  .glassButton::before,
+  .shimmer {
+    animation: none;
+    transition: none;
+  }
+}

@@ -53,7 +53,10 @@ const services: Service[] = [
 // ─────────────────────────────────────────────
 const ServicesBeat = forwardRef<
   HTMLDivElement,
-  { leftColRef: React.RefObject<HTMLDivElement | null>; rightColRef: React.RefObject<HTMLDivElement | null> }
+  {
+    leftColRef: React.RefObject<HTMLDivElement | null>
+    rightColRef: React.RefObject<HTMLDivElement | null>
+  }
 >(({ leftColRef, rightColRef }, ref) => {
   return (
     <div ref={ref} className="absolute inset-0 z-10" style={{ pointerEvents: 'none' }}>
@@ -61,7 +64,6 @@ const ServicesBeat = forwardRef<
         className="relative grid h-full w-full grid-cols-1 items-stretch px-6 pt-20 pb-24 md:grid-cols-2 md:px-12 md:pt-24 md:pb-28 lg:px-20"
         style={{ pointerEvents: 'auto' }}
       >
-        {/* Top eyebrow label */}
         <div className="absolute left-1/2 top-8 z-10 -translate-x-1/2 md:top-10">
           <div className="flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.4em] text-white/70 md:text-[11px]">
             <span className="inline-block h-px w-8 bg-white/40" />
@@ -70,7 +72,6 @@ const ServicesBeat = forwardRef<
           </div>
         </div>
 
-        {/* LEFT COLUMN */}
         <div
           ref={leftColRef}
           className="flex flex-col justify-center gap-12 pr-0 md:gap-16 md:pr-12 lg:pr-16"
@@ -79,7 +80,6 @@ const ServicesBeat = forwardRef<
           <ServiceCard service={services[1]} align="left" />
         </div>
 
-        {/* CENTER DECORATIVE DIVIDER */}
         <div
           className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:block"
           aria-hidden
@@ -125,7 +125,6 @@ const ServicesBeat = forwardRef<
           />
         </div>
 
-        {/* RIGHT COLUMN */}
         <div
           ref={rightColRef}
           className="flex flex-col justify-center gap-12 pl-0 md:gap-16 md:pl-12 lg:pl-16"
@@ -312,7 +311,7 @@ export default function Hero() {
         },
       })
 
-      // ── BEAT 0 → BEAT 1 (first 60% of timeline) ──
+      // BEAT 0 → BEAT 1 (services slide in on pink)
       tl.to(beat0Ref.current, { yPercent: -100, opacity: 0, ease: 'power2.inOut', duration: 0.5 }, 0)
       tl.to(wordmarkRef.current, { yPercent: 110, opacity: 0, ease: 'power2.inOut', duration: 0.5 }, 0)
       tl.to(wordmarkTaglineRef.current, { y: -60, opacity: 0, ease: 'power2.inOut', duration: 0.5 }, 0)
@@ -322,7 +321,7 @@ export default function Hero() {
       // Hold so services are fully visible
       tl.to({}, { duration: 0.3 })
 
-      // ── EXIT TRANSITION (last 40%) — services slide sideways, splash fades ──
+      // EXIT — services slide sideways, splash fades
       tl.to(
         leftColRef.current,
         { xPercent: -120, opacity: 0, ease: 'power3.in', duration: 0.5 },
@@ -333,9 +332,9 @@ export default function Hero() {
         { xPercent: 120, opacity: 0, ease: 'power3.in', duration: 0.5 },
         '<'
       )
-      // Splash video fades out at the same time
-      tl.to(
+      tl.fromTo(
         videoRef.current,
+        { opacity: 0.9 },
         { opacity: 0, ease: 'power2.inOut', duration: 0.5 },
         '<'
       )
@@ -352,6 +351,7 @@ export default function Hero() {
       data-hero
       className="relative h-screen w-full overflow-hidden"
       style={{
+        // BEAT 0 base — bright vibrant blue layered gradient
         background: `
           radial-gradient(circle at 30% 20%, #5eb8f5 0%, transparent 40%),
           radial-gradient(circle at 70% 35%, #1e88e5 0%, transparent 45%),
@@ -361,7 +361,7 @@ export default function Hero() {
         `,
       }}
     >
-      {/* PINK OVERLAY */}
+      {/* PINK OVERLAY (fades in on scroll for the services beat) */}
       <div
         ref={bgPinkRef}
         className="pointer-events-none absolute inset-0 z-[1]"
@@ -429,7 +429,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* BEAT 1 — passes column refs down */}
+      {/* BEAT 1 — services */}
       <ServicesBeat ref={beat1Ref} leftColRef={leftColRef} rightColRef={rightColRef} />
 
       {/* PREMIUM TAGLINE */}
