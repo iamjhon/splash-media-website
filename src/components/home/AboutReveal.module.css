@@ -33,10 +33,10 @@
   mask-position: center;
   -webkit-mask-size: cover;
   mask-size: cover;
-  mask-mode: alpha;
-  -webkit-mask-mode: alpha;
+  mask-mode: luminance;
+  -webkit-mask-mode: luminance;
   will-change: transform;
-  transform-origin: 49% 56%;
+  transform-origin: 37% 59%;
 }
 
 /* Mission / Reputation content — fades in after reveal */

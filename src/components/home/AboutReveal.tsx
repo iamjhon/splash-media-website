@@ -54,7 +54,7 @@ export default function AboutReveal() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Lock the initial state so any scroll-back returns here.
-      gsap.set(maskRef.current, { scale: 1, opacity: 1 })
+      gsap.set(maskRef.current, { scale: 1 })
       gsap.set(scrimRef.current, { opacity: 0 })
       gsap.set(contentRef.current, { opacity: 0, y: 30 })
 
@@ -70,36 +70,30 @@ export default function AboutReveal() {
         },
       })
 
-      // Phase 1: scale the mask up so the logo-hole grows.
+      // Phase 1: scale the mask up so the logo-hole grows until it covers
+      // the whole viewport — the white clears purely by zooming (no fade).
+      // Finishes at 0.6 so the white is fully gone before text appears.
       tl.fromTo(
         maskRef.current,
         { scale: 1 },
-        { scale: 60, ease: 'none', duration: 0.7 },
+        { scale: 260, ease: 'power1.in', duration: 0.6 },
         0
       )
 
-      // Phase 1b: as it gets huge, fade it out completely
-      tl.fromTo(
-        maskRef.current,
-        { opacity: 1 },
-        { opacity: 0, ease: 'none', duration: 0.25 },
-        0.5
-      )
-
-      // Scrim fades in partway through (darkens video for text legibility)
+      // Scrim fades in once the video is fully revealed
       tl.fromTo(
         scrimRef.current,
         { opacity: 0 },
-        { opacity: 1, ease: 'none', duration: 0.4 },
-        0.55
+        { opacity: 1, ease: 'none', duration: 0.2 },
+        0.6
       )
 
-      // Content fades in near the end of the reveal
+      // Content fades in after the reveal is complete
       tl.fromTo(
         contentRef.current,
         { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, ease: 'none', duration: 0.4 },
-        0.6
+        { opacity: 1, y: 0, ease: 'none', duration: 0.3 },
+        0.7
       )
     }, sectionRef)
 

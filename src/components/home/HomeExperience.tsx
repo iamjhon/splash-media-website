@@ -4,7 +4,6 @@ import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import FloatingDrops from './FloatingDrops'
 import HeroTestimonials from './HeroTestimonials'
 import ServicesRoulette from './ServicesRoulette'
 import FluidSim from './FluidSim'
@@ -75,45 +74,6 @@ const gridCells: Cell[] = [
 ]
 
 
-type Testimonial = {
-  index: string
-  quote: string
-  name: string
-  role: string
-  initials: string
-  accent: string
-}
-
-const testimonials: Testimonial[] = [
-  {
-    index: '01',
-    quote:
-      'Splash Media transformed how our nonprofit reaches the community. Their strategy moves the needle every quarter — and they make it feel effortless.',
-    name: 'Thurl Bailey',
-    role: 'NBA Champion · Salt Lake Legend',
-    initials: 'TB',
-    accent: '#60a5fa',
-  },
-  {
-    index: '02',
-    quote:
-      'I needed a marketing partner who understands the legal industry — Splash Media delivered. Their campaigns brought in qualified leads from day one.',
-    name: 'Marlene Gonzalez',
-    role: 'Attorney',
-    initials: 'MG',
-    accent: '#fbbf24',
-  },
-  {
-    index: '03',
-    quote:
-      'Working with Splash Media has elevated our brand on a national scale. They understand our mission and translate it into work that resonates.',
-    name: 'GFCBW Utah',
-    role: 'Chinese Business Women Global Federation',
-    initials: 'GF',
-    accent: '#2dd4bf',
-  },
-]
-
 // ─────────────────────────────────────────────
 // MAIN COMPONENT
 // ─────────────────────────────────────────────
@@ -122,10 +82,6 @@ export default function HomeExperience() {
   const sectionRef = useRef<HTMLElement>(null)
 
   // ─── BACKGROUND LAYERS ───
-  const pinkBgRef = useRef<HTMLDivElement>(null)
-  const blueBgRef = useRef<HTMLDivElement>(null)
-  const magentaBgRef = useRef<HTMLDivElement>(null)
-  const tealBgRef = useRef<HTMLDivElement>(null)
   const whiteBgRef = useRef<HTMLDivElement>(null)
 
   // ─── HERO ELEMENTS ───
@@ -145,12 +101,10 @@ export default function HomeExperience() {
   const fadeOverlayRef = useRef<HTMLDivElement>(null)
   const phraseCharsRef = useRef<HTMLSpanElement[]>([])
   const aboutCtaRef = useRef<HTMLAnchorElement>(null)
+  const aboutHeadingRef = useRef<HTMLDivElement>(null)
   const tileRefs = useRef<(HTMLDivElement | null)[]>([])
 
   // ─── TESTIMONIALS ELEMENTS ───
-  const testHeaderRef = useRef<HTMLDivElement>(null)
-  const testHeaderCharsRef = useRef<HTMLSpanElement[]>([])
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
 
   // ─── HERO SPLASH VIDEO LOOP ───
   useEffect(() => {
@@ -264,18 +218,14 @@ export default function HomeExperience() {
       // Initial states
       gsap.set(beat1Ref.current, { yPercent: 100, opacity: 0 })
       gsap.set(revealCenterRef.current, { scale: 0 })
-      gsap.set(phraseCharsRef.current, { opacity: 0, filter: 'blur(10px)', y: 10 })
+      if (phraseCharsRef.current && phraseCharsRef.current.length) {
+        gsap.set(phraseCharsRef.current, { opacity: 0, filter: 'blur(10px)', y: 10 })
+      }
       gsap.set(aboutCtaRef.current, { opacity: 0, y: 20 })
-      gsap.set(pinkBgRef.current, { opacity: 0 })
-      gsap.set(blueBgRef.current, { opacity: 0 })
-      gsap.set(magentaBgRef.current, { opacity: 0 })
-      gsap.set(tealBgRef.current, { opacity: 0 })
+      if (aboutHeadingRef.current) {
+        aboutHeadingRef.current.style.opacity = '0'
+      }
       gsap.set(whiteBgRef.current, { opacity: 0 })
-      gsap.set(testHeaderRef.current, { opacity: 0 })
-
-      cardRefs.current.forEach((card) => {
-        if (card) gsap.set(card, { y: 200, opacity: 0, rotate: 0 })
-      })
 
       const gallery = galleryRef.current
       gallery.style.gridTemplateColumns = '0fr 1fr 0fr'
@@ -303,45 +253,18 @@ export default function HomeExperience() {
       ScrollTrigger.create({
         trigger: sectionRef.current,
         start: 'top top',
-        end: '+=1000%',
+        end: '+=250%',
         scrub: 1,
         pin: true,
         anticipatePin: 1,
         onUpdate: (self) => {
           const p = self.progress
 
-          // ─── BACKGROUND MORPHS ───
-          // Pink disabled — video grows directly from the blue gradient bg
-          if (pinkBgRef.current) {
-            pinkBgRef.current.style.opacity = '0'
-          }
-
-          // White: morphs in as pink fades (0.24), holds through video + About CTA + bento,
-          // fades out as testimonials begin (0.55)
+          // ─── WHITE BACKGROUND MORPH (bento phase) ───
+          // Morphs in during video intro, then holds (no fade → no blue reveal)
           const whiteIn = lerp(p, 0.24, 0.30)
-          const whiteOut = lerp(p, 0.55, 0.62)
           if (whiteBgRef.current) {
-            whiteBgRef.current.style.opacity = String(Math.max(0, whiteIn - whiteOut))
-          }
-
-          // Blue (electric): appears at 0.55 (testimonials), fades at 0.65
-          const blueIn = lerp(p, 0.55, 0.62)
-          const blueOut = lerp(p, 0.65, 0.70)
-          if (blueBgRef.current) {
-            blueBgRef.current.style.opacity = String(Math.max(0, blueIn - blueOut))
-          }
-
-          // Magenta: appears at 0.65, fades at 0.74
-          const magentaIn = lerp(p, 0.65, 0.70)
-          const magentaOut = lerp(p, 0.74, 0.78)
-          if (magentaBgRef.current) {
-            magentaBgRef.current.style.opacity = String(Math.max(0, magentaIn - magentaOut))
-          }
-
-          // Teal: appears at 0.74 and stays
-          const tealIn = lerp(p, 0.74, 0.78)
-          if (tealBgRef.current) {
-            tealBgRef.current.style.opacity = String(tealIn)
+            whiteBgRef.current.style.opacity = String(whiteIn)
           }
 
           // ─── HERO PHASE A: Beat 0 → Beat 1 (0.05 → 0.10) ───
@@ -395,9 +318,12 @@ export default function HomeExperience() {
             aboutCtaRef.current.style.opacity = String(pD)
             aboutCtaRef.current.style.transform = `translateY(${(1 - pD) * 20}px)`
           }
+          if (aboutHeadingRef.current) {
+            aboutHeadingRef.current.style.opacity = String(pD)
+          }
 
-          // ─── VIDEO PHASE E: Bento expansion (0.40 → 0.50) ───
-          const pE = lerp(p, 0.40, 0.50)
+          // ─── VIDEO PHASE E: Bento expansion (0.40 → 0.95) ───
+          const pE = lerp(p, 0.40, 0.95)
           const easedE = 1 - Math.pow(1 - pE, 3)
 
           // Phrase + About CTA fade as bento expands
@@ -409,6 +335,10 @@ export default function HomeExperience() {
           if (aboutCtaRef.current && pE > 0) {
             const baseOpacity = parseFloat(aboutCtaRef.current.style.opacity || '1')
             aboutCtaRef.current.style.opacity = String(baseOpacity * Math.max(0, 1 - pE * 2))
+          }
+          if (aboutHeadingRef.current && pE > 0) {
+            const baseOpacity = parseFloat(aboutHeadingRef.current.style.opacity || '1')
+            aboutHeadingRef.current.style.opacity = String(baseOpacity * Math.max(0, 1 - pE * 2))
           }
 
           if (galleryRef.current) {
@@ -426,52 +356,7 @@ export default function HomeExperience() {
             tile.style.opacity = String(tileProgress)
           })
 
-          // ─── TRANSITION OUT OF VIDEO INTRO (0.48 → 0.55) ───
-          // Bento + everything fades out as testimonials come in
-          const pBentoOut = lerp(p, 0.48, 0.55)
-          if (galleryRef.current) {
-            galleryRef.current.style.opacity = String(1 - pBentoOut)
-          }
-
-          // ─── TESTIMONIALS PHASE A: Header reveal (0.57 → 0.63) ───
-          // Appears as white clears and the blue testimonial bg comes in
-          const pTestHeader = lerp(p, 0.57, 0.63)
-          if (testHeaderRef.current) {
-            testHeaderRef.current.style.opacity = String(pTestHeader)
-            testHeaderRef.current.style.transform = `translateY(${(1 - pTestHeader) * 30}px)`
-          }
-
-          testHeaderCharsRef.current.forEach((char, i) => {
-            if (!char) return
-            const charDelay = i * 0.003
-            const charStart = 0.58 + charDelay
-            const charProgress = lerp(p, charStart, charStart + 0.04)
-            const baseOpacity = 0.15 + charProgress * 0.85
-            char.style.opacity = String(baseOpacity)
-          })
-
-          // ─── TESTIMONIALS CARDS — driven by phase ───
-          const cardPhases = [
-            { in: 0.63, full: 0.67, out: 0.73, end: 0.77 },
-            { in: 0.73, full: 0.77, out: 0.83, end: 0.87 },
-            { in: 0.83, full: 0.87, out: 1.05, end: 1.10 }, // last card stays visible
-          ]
-
-          cardRefs.current.forEach((card, i) => {
-  if (!card) return
-  const phase = cardPhases[i]
-  const inProgress = lerp(p, phase.in, phase.full)
-  const outProgress = lerp(p, phase.out, phase.end)
-  const visible = Math.max(0, inProgress - outProgress)
-
-  card.style.opacity = String(visible)
-  // Keep horizontal centering (-50%), animate vertical + scale only
-  const y = (1 - inProgress) * 200 - outProgress * 120 // slide up in, slide up out
-  const scale = 0.92 + inProgress * 0.08
-  card.style.transform = `translateX(-50%) translateY(${y}px) scale(${scale})`
-})
-
-          // Header stays visible — no fade out, cards scroll over it
+          // Bento stays fully visible until the pin releases (no empty tail)
         },
       })
     }, sectionRef)
@@ -495,84 +380,7 @@ export default function HomeExperience() {
         `,
       }}
     >
-      {/* ── BACKGROUND GRADIENT LAYERS ── */}
-      {/* Pink — services + video intro */}
-      <div
-        ref={pinkBgRef}
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          opacity: 0,
-          zIndex: 1,
-          willChange: 'opacity',
-          background: `
-            radial-gradient(circle at 20% 30%, #ec4899 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, #f472b6 0%, transparent 55%),
-            radial-gradient(circle at 60% 80%, #c026d3 0%, transparent 50%),
-            radial-gradient(circle at 30% 70%, #be185d 0%, transparent 60%),
-            linear-gradient(135deg, #500724 0%, #831843 50%, #4a044e 100%)
-          `,
-        }}
-      />
-
-      {/* Electric Blue — Thurl Bailey card */}
-      <div
-        ref={blueBgRef}
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          opacity: 0,
-          zIndex: 2,
-          willChange: 'opacity',
-          background: `
-            radial-gradient(circle at 20% 30%, #3b82f6 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, #60a5fa 0%, transparent 55%),
-            radial-gradient(circle at 60% 80%, #1e40af 0%, transparent 50%),
-            radial-gradient(circle at 30% 70%, #1d4ed8 0%, transparent 60%),
-            linear-gradient(135deg, #0c1e3e 0%, #1e3a8a 50%, #1e1b4b 100%)
-          `,
-        }}
-      />
-
-      {/* Yellow — Marlene card */}
-<div
-  ref={magentaBgRef}
-  aria-hidden
-  className="pointer-events-none absolute inset-0"
-  style={{
-    opacity: 0,
-    zIndex: 3,
-    willChange: 'opacity',
-    background: `
-      radial-gradient(circle at 20% 30%, #f59e0b 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, #fbbf24 0%, transparent 55%),
-      radial-gradient(circle at 60% 80%, #d97706 0%, transparent 50%),
-      radial-gradient(circle at 30% 70%, #b45309 0%, transparent 60%),
-      linear-gradient(135deg, #451a03 0%, #78350f 50%, #422006 100%)
-    `,
-  }}
-/>
-
-      {/* Teal — GFCBW card */}
-      <div
-        ref={tealBgRef}
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          opacity: 0,
-          zIndex: 4,
-          willChange: 'opacity',
-          background: `
-            radial-gradient(circle at 20% 30%, #14b8a6 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, #2dd4bf 0%, transparent 55%),
-            radial-gradient(circle at 60% 80%, #0f766e 0%, transparent 50%),
-            radial-gradient(circle at 30% 70%, #134e4a 0%, transparent 60%),
-            linear-gradient(135deg, #042f2e 0%, #115e59 50%, #064e3b 100%)
-          `,
-        }}
-      />
-
-      {/* White — background morph between pink and testimonials */}
+      {/* White — background morph for bento phase */}
       <div
         ref={whiteBgRef}
         aria-hidden
@@ -787,7 +595,33 @@ export default function HomeExperience() {
 
      
 
-      {/* ─── ABOUT US CTA ─── */}
+      {/* ─── ABOUT US HEADER — grouped at top ─── */}
+      <div
+        ref={aboutHeadingRef}
+        className="pointer-events-none absolute inset-x-0 top-[12%] z-[20] px-6 text-center"
+        style={{ opacity: 0 }}
+      >
+        <p className="mb-4 text-[10px] font-medium uppercase tracking-[0.4em] text-white/70 md:text-[11px]">
+          <span className="mr-3 inline-block h-px w-8 align-middle bg-white/40" />
+          About Us
+          <span className="ml-3 inline-block h-px w-8 align-middle bg-white/40" />
+        </p>
+        <h2
+          className="mx-auto max-w-4xl text-balance text-white"
+          style={{
+            fontFamily: 'var(--font-display, sans-serif)',
+            fontSize: 'clamp(1.6rem, 3.5vw, 3rem)',
+            fontWeight: 700,
+            lineHeight: 1.15,
+            letterSpacing: '-0.02em',
+            textShadow: '0 4px 30px rgba(0,0,0,0.5)',
+          }}
+        >
+          A group of talented individuals, driven to tell your story beautifully.
+        </h2>
+      </div>
+
+      {/* ─── ABOUT US CTA — bottom center ─── */}
       <div className="absolute bottom-[8%] left-1/2 z-[20] -translate-x-1/2" style={{ pointerEvents: 'none' }}>
         <Link
           ref={aboutCtaRef}
@@ -801,60 +635,6 @@ export default function HomeExperience() {
           </span>
         </Link>
       </div>
-
-      {/* ─── FLOATING 3D DROPS (testimonials phase) ─── */}
-      <FloatingDrops headerRef={testHeaderRef} />
-
-      {/* ─── TESTIMONIALS HEADER ─── */}
-      <div
-        ref={testHeaderRef}
-        className="absolute inset-x-0 top-[15%] z-[20] px-6 text-center"
-        style={{ opacity: 0, pointerEvents: 'none' }}
-      >
-        <p className="mb-6 text-[10px] font-medium uppercase tracking-[0.4em] text-white/70 md:text-[11px]">
-          <span className="inline-block h-px w-8 align-middle bg-white/40 mr-3" />
-          Testimonials
-          <span className="inline-block h-px w-8 align-middle bg-white/40 ml-3" />
-        </p>
-        <h2
-          className="mx-auto max-w-5xl text-balance leading-[1.05] text-white"
-          style={{
-            fontFamily: 'var(--font-display, sans-serif)',
-            fontSize: 'clamp(2rem, 4vw, 4.5rem)',
-            fontWeight: 700,
-            letterSpacing: '-0.02em',
-            textShadow: '0 4px 30px rgba(14, 74, 133, 0.6), 0 2px 12px rgba(0, 0, 0, 0.4)',
-          }}
-        >
-          {'What our partners say about working with us.'.split('').map((char, i) => (
-            <span
-              key={i}
-              ref={(el) => {
-                if (el) testHeaderCharsRef.current[i] = el
-              }}
-              style={{
-                display: 'inline-block',
-                whiteSpace: char === ' ' ? 'pre' : 'normal',
-                opacity: 0.15,
-              }}
-            >
-              {char}
-            </span>
-          ))}
-        </h2>
-      </div>
-
-      {/* ─── TESTIMONIAL CARDS ─── */}
-      {testimonials.map((t, i) => (
-        <TestimonialCard
-          key={i}
-          testimonial={t}
-          total={testimonials.length}
-          cardRef={(el) => {
-            cardRefs.current[i] = el
-          }}
-        />
-      ))}
     </section>
   )
 }
@@ -924,112 +704,6 @@ function ServiceCard({ service, align }: { service: Service; align: 'left' | 'ri
           →
         </span>
       </Link>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────
-// SUB-COMPONENT: TESTIMONIAL CARD
-// ─────────────────────────────────────────────
-function TestimonialCard({
-  testimonial,
-  total,
-  cardRef,
-}: {
-  testimonial: Testimonial
-  total: number
-  cardRef: (el: HTMLDivElement | null) => void
-}) {
-  return (
-    <div
-      ref={cardRef}
-      className="absolute left-1/2 top-[42%] z-[25] w-[92%] max-w-5xl overflow-hidden rounded-3xl border border-white/10 px-8 py-12 backdrop-blur-md md:px-14 md:py-16"
-      style={{
-        pointerEvents: 'none',
-        background:
-          'linear-gradient(145deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)',
-        boxShadow:
-          '0 30px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.10)',
-        opacity: 0,
-        transform: 'translateX(-50%)',
-      }}
-    >
-      <span
-        aria-hidden
-        className="pointer-events-none absolute right-6 top-2 select-none md:right-10 md:top-4"
-        style={{
-          fontFamily: 'var(--font-display, sans-serif)',
-          fontSize: 'clamp(7rem, 13vw, 13rem)',
-          fontWeight: 700,
-          color: 'rgba(255, 255, 255, 0.04)',
-          letterSpacing: '-0.04em',
-          lineHeight: 0.85,
-        }}
-      >
-        {testimonial.index}
-        <span style={{ fontSize: '0.45em', opacity: 0.6 }}> / 0{total}</span>
-      </span>
-
-      <div className="relative z-10 grid gap-8 md:grid-cols-[1.4fr_1fr] md:gap-12">
-        <div>
-          <span
-            aria-hidden
-            className="block text-[6rem] leading-none"
-            style={{
-              fontFamily: 'var(--font-display, sans-serif)',
-              color: testimonial.accent,
-              opacity: 0.7,
-              marginTop: '-2rem',
-              marginBottom: '-2rem',
-            }}
-          >
-            “
-          </span>
-          <p
-            className="text-balance text-xl italic leading-snug text-white/95 md:text-2xl"
-            style={{ fontFamily: 'var(--font-body, serif)' }}
-          >
-            {testimonial.quote}
-          </p>
-        </div>
-
-        <div className="flex flex-col items-start gap-5 md:items-end md:text-right">
-          <div className="flex items-center gap-4 md:flex-row-reverse">
-            <div
-              className="flex h-14 w-14 items-center justify-center rounded-full text-sm font-medium text-white md:h-16 md:w-16 md:text-base"
-              style={{
-                background: `linear-gradient(135deg, ${testimonial.accent}AA 0%, ${testimonial.accent}33 100%)`,
-                border: `1px solid ${testimonial.accent}66`,
-                fontFamily: 'var(--font-narrow, sans-serif)',
-                letterSpacing: '0.05em',
-              }}
-            >
-              {testimonial.initials}
-            </div>
-
-            <div className="flex flex-col md:items-end">
-              <p
-                className="text-base font-medium uppercase tracking-[0.15em] text-white md:text-lg"
-                style={{ fontFamily: 'var(--font-narrow, sans-serif)' }}
-              >
-                {testimonial.name}
-              </p>
-              <p
-                className="text-[11px] uppercase tracking-[0.25em] text-white/55 md:text-xs"
-                style={{ fontFamily: 'var(--font-body, sans-serif)' }}
-              >
-                {testimonial.role}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-1" style={{ color: testimonial.accent }}>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i} className="text-lg">★</span>
-            ))}
-          </div>
-        </div>
-      </div>
     </div>
   )
 }

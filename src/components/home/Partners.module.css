@@ -1,0 +1,592 @@
+.slidesWrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Each stacking card — fixed viewport height like the CodePen */
+.section {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 16px;
+  will-change: transform, opacity;
+}
+
+.sectionContent {
+  width: 100%;
+  height: 100%;
+}
+
+.sectionInner {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3.5rem;
+  padding: 4rem 2rem;
+  box-sizing: border-box;
+}
+
+/* ── Card backgrounds ── */
+.card1 {
+  background: #ffffff;
+}
+.card2 {
+  background: linear-gradient(160deg, #3a1030 0%, #1a0518 100%);
+}
+.card3 {
+  background: #ffffff;
+}
+
+/* ── Eyebrow (dark on white card 1) ── */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  font-family: var(--font-narrow, sans-serif);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(6, 26, 54, 0.7);
+}
+
+.eyebrowLine {
+  display: inline-block;
+  width: 32px;
+  height: 1px;
+  background: rgba(6, 26, 54, 0.35);
+}
+
+/* ── Block group (Awards / Partnerships) ── */
+.blockGroup {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.blockHeading {
+  margin: 0;
+  font-family: var(--font-gobold, sans-serif);
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: #061a36;
+}
+
+/* ── Awards carousel ── */
+.awardsCarousel {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.awardsTrack {
+  position: relative;
+  width: 260px;
+  height: 120px;
+}
+
+.awardSlide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.awardLogo {
+  max-width: 220px;
+  max-height: 110px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  opacity: 1;
+}
+
+/* ── Partnerships card (Card 3) — big top-left header ── */
+.partnersInner {
+  align-items: stretch;
+  justify-content: center;
+  gap: 3rem;
+}
+
+.partnersHead {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.partnersTitle {
+  margin: 0;
+  font-family: var(--font-gobold, sans-serif);
+  font-size: clamp(3.5rem, 11vw, 10rem);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #061a36;
+}
+
+.partnersSub {
+  margin: 1.25rem 0 0;
+  font-family: var(--font-body, sans-serif);
+  font-size: clamp(1rem, 1.6vw, 1.5rem);
+  line-height: 1.35;
+  color: rgba(6, 26, 54, 0.7);
+  max-width: 46ch;
+}
+
+/* ── Partnership marquees (2 scrolling rows) ── */
+.marqueeWrap {
+  --marquee-gap: 2rem;
+  --marquee-duration: 40s;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow: hidden;
+}
+
+.marquee {
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  gap: var(--marquee-gap);
+  mask-image: linear-gradient(
+    to right,
+    hsl(0 0% 0% / 0),
+    hsl(0 0% 0% / 1) 12%,
+    hsl(0 0% 0% / 1) 88%,
+    hsl(0 0% 0% / 0)
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    hsl(0 0% 0% / 0),
+    hsl(0 0% 0% / 1) 12%,
+    hsl(0 0% 0% / 1) 88%,
+    hsl(0 0% 0% / 0)
+  );
+}
+
+.marqueeGroup {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--marquee-gap);
+  min-width: 100%;
+  animation: scroll-x var(--marquee-duration) linear infinite;
+}
+
+.marqueeReverse .marqueeGroup {
+  animation-direction: reverse;
+}
+
+@keyframes scroll-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--marquee-gap)));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marqueeGroup {
+    animation-play-state: paused;
+  }
+}
+
+.logoCell {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  height: 90px;
+  border-radius: 10px;
+  background: rgba(6, 26, 54, 0.03);
+  border: 1px solid rgba(6, 26, 54, 0.1);
+  padding: 1.25rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.logoCell:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(6, 26, 54, 0.12);
+}
+
+.partnerLogo {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.logoCell:hover .partnerLogo {
+  opacity: 1;
+}
+
+/* ── Community Engagement (Card 2) — video bg, editorial layout ── */
+.card2Video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.card2Overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to top,
+    rgba(6, 26, 54, 0.8) 0%,
+    rgba(6, 26, 54, 0.35) 40%,
+    rgba(6, 26, 54, 0.1) 70%,
+    rgba(6, 26, 54, 0.2) 100%
+  );
+}
+
+/* Layout: content bottom-left, button bottom-right */
+.card2Layout {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: clamp(2rem, 5vw, 4rem);
+}
+
+.card2Left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  text-align: left;
+  max-width: 60%;
+}
+
+.card2Tag {
+  display: inline-block;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  font-family: var(--font-narrow, sans-serif);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.card2Title {
+  margin: 0;
+  font-family: var(--font-gobold, sans-serif);
+  font-size: clamp(2.5rem, 7vw, 6.5rem);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+}
+
+.card2Sub {
+  margin: 0.5rem 0 0;
+  font-family: var(--font-body, sans-serif);
+  font-size: clamp(1rem, 1.5vw, 1.4rem);
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 40ch;
+}
+
+/* Explore button — pill + arrow circle, bottom-right */
+.card2Explore {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.card2ExploreLabel {
+  display: inline-flex;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-radius: 999px;
+  background: #ffffff;
+  font-family: var(--font-narrow, sans-serif);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #061a36;
+  transition: background 0.3s ease;
+}
+
+.card2ExploreArrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  background: #ec4899;
+  color: #ffffff;
+  font-size: 1.2rem;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.card2Explore:hover .card2ExploreLabel {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.card2Explore:hover .card2ExploreArrow {
+  transform: rotate(45deg) scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .card2Layout {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .card2Left {
+    max-width: 100%;
+  }
+}
+
+/* ── Community Engagement gallery ── */
+.communityHead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.communitySub {
+  margin: 0;
+  font-family: var(--font-body, sans-serif);
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 42ch;
+}
+
+.gallery {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  max-width: 1000px;
+  height: 420px;
+}
+
+.panel {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: flex 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* entrance */
+  opacity: 0;
+  transform: translateY(40px);
+  animation: panelIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--panel-i) * 0.1s);
+}
+
+@keyframes panelIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.panel:hover {
+  flex: 2.6;
+}
+
+.panelBg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transform: scale(1.05);
+  transition: transform 0.6s ease;
+}
+
+.panel:hover .panelBg {
+  transform: scale(1);
+}
+
+.panelOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10, 5, 24, 0.9) 0%, rgba(10, 5, 24, 0.2) 55%, rgba(10, 5, 24, 0.1) 100%);
+}
+
+.panelContent {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.5rem;
+  text-align: left;
+}
+
+.panelTitle {
+  margin: 0;
+  font-family: var(--font-gobold, sans-serif);
+  font-size: clamp(1.1rem, 1.6vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: #ffffff;
+  /* vertical when collapsed, horizontal on hover */
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  transition: writing-mode 0s, transform 0.4s ease;
+}
+
+.panel:hover .panelTitle {
+  writing-mode: horizontal-tb;
+  transform: rotate(0deg);
+  margin-bottom: 0.5rem;
+}
+
+.panelSub,
+.panelLink {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease 0.1s, transform 0.4s ease 0.1s;
+  pointer-events: none;
+}
+
+.panel:hover .panelSub,
+.panel:hover .panelLink {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.panelSub {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 32ch;
+}
+
+.panelLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+  font-family: var(--font-narrow, sans-serif);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  padding-bottom: 2px;
+  transition: border-color 0.3s ease, gap 0.3s ease;
+}
+
+.panelLink:hover {
+  border-color: #ffffff;
+  gap: 0.75rem;
+}
+
+/* CTA button (View All Events) */
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.85rem 2rem;
+  font-family: var(--font-narrow, sans-serif);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  transition: border-color 0.3s ease, background 0.3s ease, gap 0.3s ease;
+}
+
+.cta:hover {
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.2);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .gallery {
+    flex-direction: column;
+    height: auto;
+  }
+  .panel {
+    height: 120px;
+  }
+  .panel:hover {
+    flex: 1;
+    height: 260px;
+  }
+  .panelTitle {
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
+}
+
+/* ── Coming soon cards ── */
+.cardTitle {
+  margin: 0;
+  font-family: var(--font-gobold, sans-serif);
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  text-align: center;
+}
+
+.comingSoon {
+  margin: 1rem 0 0;
+  font-family: var(--font-body, sans-serif);
+  font-size: 1rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
