@@ -1,15 +1,16 @@
 import HeroExperience from '@/components/about/HeroExperience'
+import StaffLineup from '@/components/about/StaffLineup'
+import SplashCTA from '@/components/about/SplashCTA'
+
+
 
 export default function AboutPage() {
   return (
     <main className="relative">
       <HeroExperience />
-      {/* Future about-page components go here:
-          <TeamSection />
-          <ValuesSection />
-          <ClientLogos />
-          etc.
-      */}
+      <StaffLineup />
+      <SplashCTA />
+    
     </main>
   )
 }

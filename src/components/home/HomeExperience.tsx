@@ -4,7 +4,11 @@ import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import SplashButton from '@/components/layout/SplashButton'
+import FloatingDrops from './FloatingDrops'
+import HeroTestimonials from './HeroTestimonials'
+import ServicesRoulette from './ServicesRoulette'
+import FluidSim from './FluidSim'
+import GradientBlobBg from './GradientBlobBg'
 
 
 if (typeof window !== 'undefined') {
@@ -70,7 +74,6 @@ const gridCells: Cell[] = [
   { type: 'image', src: '/portfolio/home/tile-08.jpg' },
 ]
 
-const REVEAL_PHRASE = "Premium creative for Utah's most ambitious brands."
 
 type Testimonial = {
   index: string
@@ -123,14 +126,13 @@ export default function HomeExperience() {
   const blueBgRef = useRef<HTMLDivElement>(null)
   const magentaBgRef = useRef<HTMLDivElement>(null)
   const tealBgRef = useRef<HTMLDivElement>(null)
+  const whiteBgRef = useRef<HTMLDivElement>(null)
 
   // ─── HERO ELEMENTS ───
   const heroSplashRef = useRef<HTMLVideoElement>(null)
+  const heroBgRef = useRef<HTMLDivElement>(null)
   const labelRef = useRef<HTMLDivElement>(null)
-  const taglineRef = useRef<HTMLParagraphElement>(null)
-  const ctaRef = useRef<HTMLAnchorElement>(null)
-  const wordmarkRef = useRef<HTMLHeadingElement>(null)
-  const wordmarkTaglineRef = useRef<HTMLParagraphElement>(null)
+  const taglineRef = useRef<HTMLDivElement>(null)
   const beat0Ref = useRef<HTMLDivElement>(null)
   const beat1Ref = useRef<HTMLDivElement>(null)
   const leftColRef = useRef<HTMLDivElement>(null)
@@ -155,14 +157,30 @@ export default function HomeExperience() {
     const video = heroSplashRef.current
     if (!video) return
 
-    const LOOP_END = 12
+    // Loop at the earlier of: the video's real end, or an optional cap.
+    // Set LOOP_CAP to a number of seconds to loop early; null = full clip.
+    const LOOP_CAP: number | null = null
+
     const handleTimeUpdate = () => {
-      if (video.currentTime >= LOOP_END) video.currentTime = 0
+      const end = LOOP_CAP ?? video.duration
+      if (end && video.currentTime >= end - 0.05) {
+        video.currentTime = 0
+        video.play().catch(() => {})
+      }
     }
+    const handleEnded = () => {
+      video.currentTime = 0
+      video.play().catch(() => {})
+    }
+
     video.addEventListener('timeupdate', handleTimeUpdate)
+    video.addEventListener('ended', handleEnded)
     video.play().catch(() => {})
 
-    return () => video.removeEventListener('timeupdate', handleTimeUpdate)
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate)
+      video.removeEventListener('ended', handleEnded)
+    }
   }, [])
 
   // ─── BENTO VIDEO SEAMLESS LOOP ───
@@ -217,36 +235,21 @@ export default function HomeExperience() {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
+      // Label fades/slides up
       tl.fromTo(
-        heroSplashRef.current,
-        { opacity: 0 },
-        { opacity: 0.9, duration: 1.6, ease: 'power2.inOut' },
-        0.1
-      )
-
-      tl.fromTo(
-        [labelRef.current, taglineRef.current, ctaRef.current],
+        labelRef.current,
         { y: 24, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1, stagger: 0.12 },
+        { y: 0, opacity: 1, duration: 1 },
         0.1
       )
 
+      // Masked-video headline fades + scales in
       tl.fromTo(
-        wordmarkTaglineRef.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 1, ease: 'power2.out' },
-        1.2
+        taglineRef.current,
+        { opacity: 0, scale: 0.94, y: 20 },
+        { opacity: 1, scale: 1, y: 0, duration: 1.2, ease: 'power3.out' },
+        0.1
       )
-
-      const chars = wordmarkRef.current?.querySelectorAll('.char')
-      if (chars) {
-        tl.fromTo(
-          chars,
-          { y: '110%', opacity: 0 },
-          { y: '0%', opacity: 1, duration: 1.2, stagger: 0.04, ease: 'expo.out' },
-          0.8
-        )
-      }
     }, sectionRef)
 
     return () => ctx.revert()
@@ -267,6 +270,7 @@ export default function HomeExperience() {
       gsap.set(blueBgRef.current, { opacity: 0 })
       gsap.set(magentaBgRef.current, { opacity: 0 })
       gsap.set(tealBgRef.current, { opacity: 0 })
+      gsap.set(whiteBgRef.current, { opacity: 0 })
       gsap.set(testHeaderRef.current, { opacity: 0 })
 
       cardRefs.current.forEach((card) => {
@@ -307,29 +311,35 @@ export default function HomeExperience() {
           const p = self.progress
 
           // ─── BACKGROUND MORPHS ───
-          // Pink: appears at 0.07, holds, fades out at 0.50
-          const pinkIn = lerp(p, 0.07, 0.12)
-          const pinkOut = lerp(p, 0.50, 0.55)
+          // Pink disabled — video grows directly from the blue gradient bg
           if (pinkBgRef.current) {
-            pinkBgRef.current.style.opacity = String(Math.max(0, pinkIn - pinkOut))
+            pinkBgRef.current.style.opacity = '0'
           }
 
-          // Blue (electric): appears at 0.50, fades at 0.60
-          const blueIn = lerp(p, 0.50, 0.55)
-          const blueOut = lerp(p, 0.60, 0.65)
+          // White: morphs in as pink fades (0.24), holds through video + About CTA + bento,
+          // fades out as testimonials begin (0.55)
+          const whiteIn = lerp(p, 0.24, 0.30)
+          const whiteOut = lerp(p, 0.55, 0.62)
+          if (whiteBgRef.current) {
+            whiteBgRef.current.style.opacity = String(Math.max(0, whiteIn - whiteOut))
+          }
+
+          // Blue (electric): appears at 0.55 (testimonials), fades at 0.65
+          const blueIn = lerp(p, 0.55, 0.62)
+          const blueOut = lerp(p, 0.65, 0.70)
           if (blueBgRef.current) {
             blueBgRef.current.style.opacity = String(Math.max(0, blueIn - blueOut))
           }
 
-          // Magenta: appears at 0.60, fades at 0.70
-          const magentaIn = lerp(p, 0.60, 0.65)
-          const magentaOut = lerp(p, 0.70, 0.75)
+          // Magenta: appears at 0.65, fades at 0.74
+          const magentaIn = lerp(p, 0.65, 0.70)
+          const magentaOut = lerp(p, 0.74, 0.78)
           if (magentaBgRef.current) {
             magentaBgRef.current.style.opacity = String(Math.max(0, magentaIn - magentaOut))
           }
 
-          // Teal: appears at 0.70 and stays
-          const tealIn = lerp(p, 0.70, 0.75)
+          // Teal: appears at 0.74 and stays
+          const tealIn = lerp(p, 0.74, 0.78)
           if (tealBgRef.current) {
             tealBgRef.current.style.opacity = String(tealIn)
           }
@@ -340,21 +350,13 @@ export default function HomeExperience() {
             beat0Ref.current.style.transform = `translateY(${-pA * 100}%)`
             beat0Ref.current.style.opacity = String(1 - pA)
           }
-          if (wordmarkRef.current) {
-            wordmarkRef.current.style.transform = `translateY(${pA * 110}%)`
-            wordmarkRef.current.style.opacity = String(1 - pA)
-          }
-          if (wordmarkTaglineRef.current) {
-            wordmarkTaglineRef.current.style.transform = `translateY(${-pA * 60}px)`
-            wordmarkTaglineRef.current.style.opacity = String(1 - pA)
-          }
           if (beat1Ref.current) {
             beat1Ref.current.style.transform = `translateY(${(1 - pA) * 100}%)`
             beat1Ref.current.style.opacity = String(pA)
           }
 
-          // ─── HERO PHASE B: services slide out + splash fades (0.15 → 0.22) ───
-          const pB = lerp(p, 0.15, 0.22)
+          // ─── HERO PHASE B: services slide out + splash fades (0.22 → 0.28) ───
+          const pB = lerp(p, 0.22, 0.28)
           if (leftColRef.current) {
             leftColRef.current.style.transform = `translateX(${-pB * 120}%)`
             leftColRef.current.style.opacity = String(1 - pB)
@@ -363,15 +365,15 @@ export default function HomeExperience() {
             rightColRef.current.style.transform = `translateX(${pB * 120}%)`
             rightColRef.current.style.opacity = String(1 - pB)
           }
-          if (heroSplashRef.current) {
-            heroSplashRef.current.style.opacity = String(0.9 * (1 - pB))
+          if (heroBgRef.current) {
+            heroBgRef.current.style.opacity = String(1 - pB)
           }
           if (beat1Ref.current && pB > 0) {
   beat1Ref.current.style.opacity = String(1 - pB)
 }
 
-          // ─── VIDEO PHASE C: scale-grow + char reveal (0.22 → 0.32) ───
-          const pC = lerp(p, 0.22, 0.32)
+          // ─── VIDEO PHASE C: scale-grow + char reveal (0.28 → 0.38) ───
+          const pC = lerp(p, 0.28, 0.38)
           const easedC = 1 - Math.pow(1 - pC, 3)
           if (revealCenterRef.current) {
             revealCenterRef.current.style.transform = `scale(${easedC})`
@@ -380,7 +382,7 @@ export default function HomeExperience() {
           phraseCharsRef.current.forEach((char, i) => {
             if (!char) return
             const charDelay = i * 0.003
-            const charStart = 0.25 + charDelay
+            const charStart = 0.31 + charDelay
             const charProgress = lerp(p, charStart, charStart + 0.05)
             char.style.opacity = String(charProgress)
             char.style.filter = `blur(${(1 - charProgress) * 10}px)`
@@ -431,8 +433,9 @@ export default function HomeExperience() {
             galleryRef.current.style.opacity = String(1 - pBentoOut)
           }
 
-          // ─── TESTIMONIALS PHASE A: Header reveal (0.52 → 0.58) ───
-          const pTestHeader = lerp(p, 0.52, 0.58)
+          // ─── TESTIMONIALS PHASE A: Header reveal (0.57 → 0.63) ───
+          // Appears as white clears and the blue testimonial bg comes in
+          const pTestHeader = lerp(p, 0.57, 0.63)
           if (testHeaderRef.current) {
             testHeaderRef.current.style.opacity = String(pTestHeader)
             testHeaderRef.current.style.transform = `translateY(${(1 - pTestHeader) * 30}px)`
@@ -441,20 +444,17 @@ export default function HomeExperience() {
           testHeaderCharsRef.current.forEach((char, i) => {
             if (!char) return
             const charDelay = i * 0.003
-            const charStart = 0.53 + charDelay
+            const charStart = 0.58 + charDelay
             const charProgress = lerp(p, charStart, charStart + 0.04)
             const baseOpacity = 0.15 + charProgress * 0.85
             char.style.opacity = String(baseOpacity)
           })
 
           // ─── TESTIMONIALS CARDS — driven by phase ───
-          // Card 1: in at 0.58, fully visible 0.62, fades out 0.66
-          // Card 2: in at 0.66, fully visible 0.70, fades out 0.74
-          // Card 3: in at 0.74, fully visible 0.78, hold to end
           const cardPhases = [
-            { in: 0.58, full: 0.62, out: 0.68, end: 0.72 },
-            { in: 0.68, full: 0.72, out: 0.78, end: 0.82 },
-            { in: 0.78, full: 0.82, out: 1.05, end: 1.10 }, // last card stays visible
+            { in: 0.63, full: 0.67, out: 0.73, end: 0.77 },
+            { in: 0.73, full: 0.77, out: 0.83, end: 0.87 },
+            { in: 0.83, full: 0.87, out: 1.05, end: 1.10 }, // last card stays visible
           ]
 
           cardRefs.current.forEach((card, i) => {
@@ -471,20 +471,13 @@ export default function HomeExperience() {
   card.style.transform = `translateX(-50%) translateY(${y}px) scale(${scale})`
 })
 
-          // Header fades out when last card transitions in
-          const pHeaderOut = lerp(p, 0.62, 0.68)
-          if (testHeaderRef.current && pHeaderOut > 0) {
-            const currentOp = parseFloat(testHeaderRef.current.style.opacity || '1')
-            testHeaderRef.current.style.opacity = String(currentOp * (1 - pHeaderOut))
-          }
+          // Header stays visible — no fade out, cards scroll over it
         },
       })
     }, sectionRef)
 
     return () => ctx.revert()
   }, [])
-
-  const wordmark = 'Splash Media'
 
   return (
     <section
@@ -579,143 +572,143 @@ export default function HomeExperience() {
         }}
       />
 
-      {/* ─── HERO SPLASH VIDEO ─── */}
-      <video
-        ref={heroSplashRef}
-        autoPlay
-        muted
-        playsInline
-        preload="auto"
-        className="absolute inset-0 z-[5] h-full w-full object-cover"
-        style={{ mixBlendMode: 'screen', opacity: 0.9 }}
-      >
-        <source src="/videos/ms.mp4" type="video/mp4" />
-      </video>
+      {/* White — background morph between pink and testimonials */}
+      <div
+        ref={whiteBgRef}
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          opacity: 0,
+          zIndex: 4,
+          willChange: 'opacity',
+          background: '#ffffff',
+        }}
+      />
 
-      {/* ─── BEAT 0 — intro copy ─── */}
-      {/* ─── BEAT 0 — intro copy ─── */}
-<div ref={beat0Ref} className="absolute inset-0 z-[10]" style={{ pointerEvents: 'none' }}>
-<div
-  className="absolute left-16 top-40 max-w-sm text-left md:left-24 md:top-48 lg:left-32"
-  style={{ pointerEvents: 'auto' }}
->
-          <div
-            ref={labelRef}
-            className="mb-4 inline-flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.3em] text-white/70"
-          >
-            <span className="inline-block h-px w-8 bg-white/40" />
-            Salt Lake City · Est. 2010
-          </div>
-
-          <p
-            ref={taglineRef}
-            className="mb-6 text-balance text-sm leading-relaxed text-white/85 md:text-base"
-            style={{ fontFamily: 'var(--font-body, system-ui)' }}
-          >
-            A Utah marketing agency built for brands that refuse to blend in.
-            Strategy, design, and campaigns that move the needle — and the crowd.
-          </p>
-
-        </div>
+      {/* ─── HERO GRADIENT BLOB BACKGROUND ─── */}
+      <div ref={heroBgRef} className="absolute inset-0 z-[5]">
+        <GradientBlobBg />
       </div>
 
-      {/* ─── BEAT 1 — services 2x2 ─── */}
-      <div ref={beat1Ref} className="absolute inset-0 z-[10]" style={{ pointerEvents: 'none' }}>
+      <FluidSim />
+      {/* ─── BEAT 0 — intro copy ─── */}
+      <div ref={beat0Ref} className="absolute inset-0 z-[10]" style={{ pointerEvents: 'none' }}>
+        {/* Giant headline + subtitle, vertically centered */}
         <div
-          className="relative grid h-full w-full grid-cols-1 items-stretch px-6 pt-20 pb-24 md:grid-cols-2 md:px-12 md:pt-24 md:pb-28 lg:px-20"
+          className="absolute left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 px-4 text-center md:px-8"
           style={{ pointerEvents: 'auto' }}
         >
-          <div className="absolute left-1/2 top-32 z-10 -translate-x-1/2 md:top-40">
-            <div className="flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.4em] text-white/70 md:text-[11px]">
-              <span className="inline-block h-px w-8 bg-white/40" />
-              What We Do
-              <span className="inline-block h-px w-8 bg-white/40" />
-            </div>
+          {/* WE ARE SPLASH — video revealed through the letters */}
+          <div ref={taglineRef} className="hero-masktext" aria-label="We Are Splash">
+            <svg
+              viewBox="0 0 1100 200"
+              preserveAspectRatio="xMidYMid meet"
+              style={{ width: '100%', height: 'auto', display: 'block', filter: 'drop-shadow(0 8px 40px rgba(6,26,54,0.4))' }}
+            >
+              <defs>
+                <mask id="heroTextMask">
+                  <rect width="100%" height="100%" fill="black" />
+                  <text
+                    x="50%"
+                    y="50%"
+                    dominantBaseline="middle"
+                    textAnchor="middle"
+                    fill="white"
+                    style={{
+                      fontFamily: 'var(--font-gobold, sans-serif)',
+                      fontWeight: 700,
+                      fontSize: '180px',
+                      letterSpacing: '-6px',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    WE ARE SPLASH
+                  </text>
+                </mask>
+              </defs>
+
+              {/* the video, clipped to the text mask */}
+              <foreignObject width="1100" height="200" mask="url(#heroTextMask)">
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                >
+                  <source src="/videos/bigbg.mp4" type="video/mp4" />
+                </video>
+              </foreignObject>
+            </svg>
           </div>
 
-          <div ref={leftColRef} className="flex flex-col justify-center gap-12 pr-0 md:gap-16 md:pr-12 lg:pr-16">
-            <ServiceCard service={services[0]} align="left" />
-            <ServiceCard service={services[1]} align="left" />
-          </div>
+          {/* PREMIUM MARKETING AGENCY — thin subtitle */}
+<p
+  ref={labelRef}
+  className="mt-8 text-white"
+  style={{
+    fontFamily: 'var(--font-body, sans-serif)',
+    fontSize: 'clamp(1rem, 3vw, 2.2rem)',
+    fontWeight: 300,
+    letterSpacing: '0.12em',
+    textTransform: 'uppercase',
+  }}
+>
+  Premium Marketing Agency
+</p>
+<HeroTestimonials /> 
+        </div>
 
-          {/* Center divider */}
-          <div
-            className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:block"
-            aria-hidden
-            style={{ height: '60%', width: '1px' }}
-          >
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.3) 20%, rgba(255,255,255,0.3) 80%, transparent 100%)',
-              }}
-            />
-            <div
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                background:
-                  'radial-gradient(circle, #ffffff 0%, rgba(255,255,255,0.5) 40%, transparent 70%)',
-                boxShadow: '0 0 20px rgba(255, 255, 255, 0.4)',
-              }}
-            />
-            <div className="absolute left-1/2 -translate-x-1/2" style={{ top: '20%', width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.5)' }} />
-            <div className="absolute left-1/2 -translate-x-1/2" style={{ top: '80%', width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.5)' }} />
-          </div>
+       {/* Scroll-down indicator — bottom center */}
+<div
+  className="absolute bottom-[8%] left-1/2 -translate-x-1/2"
+  style={{ pointerEvents: 'none' }}
+>
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
+    <span
+      style={{
+        fontFamily: 'var(--font-body, sans-serif)',
+        fontSize: '0.7rem',
+        fontWeight: 400,
+        letterSpacing: '0.3em',
+        textTransform: 'uppercase',
+        color: 'rgba(255,255,255,0.7)',
+      }}
+    >
+      Scroll to explore
+    </span>
+    <span
+      aria-hidden
+      style={{
+        display: 'block',
+        width: '1px',
+        height: '48px',
+        background: 'linear-gradient(to bottom, rgba(255,255,255,0.6), transparent)',
+        animation: 'scrollLine 2s ease-in-out infinite',
+      }}
+    />
+  </div>
+</div>
+      </div>
 
-          <div ref={rightColRef} className="flex flex-col justify-center gap-12 pl-0 md:gap-16 md:pl-12 lg:pl-16">
-            <ServiceCard service={services[2]} align="right" />
-            <ServiceCard service={services[3]} align="right" />
+      {/* ─── BEAT 1 — services roulette ─── */}
+      <div ref={beat1Ref} className="absolute inset-0 z-[16]" style={{ pointerEvents: 'none' }}>
+        <div
+          className="relative flex h-full w-full items-center px-6 md:px-12 lg:px-20"
+          style={{ pointerEvents: 'auto' }}
+        >
+          {/* hidden spacer keeps leftColRef valid for scroll animation */}
+          <div ref={leftColRef} className="hidden" aria-hidden />
+
+          {/* Services list (has its own "What We Do" header) */}
+          <div ref={rightColRef} className="h-full w-full">
+            <ServicesRoulette />
           </div>
         </div>
       </div>
 
-      {/* ─── PREMIUM TAGLINE ─── */}<p
-  ref={wordmarkTaglineRef}
-  className="pointer-events-none absolute bottom-[42%] left-0 right-0 z-[10] text-center md:bottom-[40%]"
-        style={{
-          fontFamily: 'var(--font-body, sans-serif)',
-          fontSize: 'clamp(0.7rem, 0.85vw, 0.9rem)',
-          fontWeight: 500,
-          color: 'rgba(255, 255, 255, 0.75)',
-          letterSpacing: '0.35em',
-          textTransform: 'uppercase',
-        }}
-      >
-        <span style={{ opacity: 0.55 }}>—</span>
-        &nbsp;&nbsp;Premium Creative for Utah&apos;s Most Ambitious Brands&nbsp;&nbsp;
-        <span style={{ opacity: 0.55 }}>—</span>
-      </p>
 
-      {/* ─── SPLASH MEDIA WORDMARK ─── */}
-      <h1
-        ref={wordmarkRef}
-        className="splash-wordmark absolute bottom-0 left-0 right-0 z-[10] select-none px-4 pb-24 text-center leading-[0.95] md:pb-24"
-        style={{
-          fontFamily: 'var(--font-condensed)',
-          fontSize: 'clamp(4rem, 20vw, 21rem)',
-          letterSpacing: '0em',
-          fontWeight: 700,
-          textTransform: 'uppercase',
-          pointerEvents: 'none',
-        }}
-        aria-label={wordmark}
-      >
-        <span className="inline-block overflow-hidden align-bottom">
-          {wordmark.split('').map((char, i) => (
-            <span
-              key={i}
-              className="char inline-block"
-              style={{ whiteSpace: char === ' ' ? 'pre' : 'normal' }}
-            >
-              {char}
-            </span>
-          ))}
-        </span>
-      </h1>
 
       {/* ─── VIDEO INTRO BENTO GRID ─── */}
       <div
@@ -792,42 +785,10 @@ export default function HomeExperience() {
         ))}
       </div>
 
-      {/* ─── VIDEO INTRO PHRASE ─── */}
-      <p
-        className="absolute left-1/2 z-[20] -translate-x-1/2 px-6 text-center"
-        style={{
-          bottom: '15%',
-          fontFamily: 'var(--font-body, sans-serif)',
-          fontSize: 'clamp(0.85rem, 1.1vw, 1.1rem)',
-          fontWeight: 500,
-          color: 'rgba(255, 255, 255, 0.95)',
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-          maxWidth: '900px',
-          pointerEvents: 'none',
-        }}
-      >
-        {REVEAL_PHRASE.split('').map((char, i) => (
-          <span
-            key={i}
-            ref={(el) => {
-              if (el) phraseCharsRef.current[i] = el
-            }}
-            style={{
-              display: 'inline-block',
-              whiteSpace: char === ' ' ? 'pre' : 'normal',
-              opacity: 0,
-              filter: 'blur(10px)',
-              transform: 'translateY(10px)',
-            }}
-          >
-            {char}
-          </span>
-        ))}
-      </p>
+     
 
       {/* ─── ABOUT US CTA ─── */}
-      <div className="absolute bottom-[8%] left-1/2 z-[20] -translate-x-1/2">
+      <div className="absolute bottom-[8%] left-1/2 z-[20] -translate-x-1/2" style={{ pointerEvents: 'none' }}>
         <Link
           ref={aboutCtaRef}
           href="/about"
@@ -841,11 +802,14 @@ export default function HomeExperience() {
         </Link>
       </div>
 
+      {/* ─── FLOATING 3D DROPS (testimonials phase) ─── */}
+      <FloatingDrops headerRef={testHeaderRef} />
+
       {/* ─── TESTIMONIALS HEADER ─── */}
       <div
         ref={testHeaderRef}
         className="absolute inset-x-0 top-[15%] z-[20] px-6 text-center"
-        style={{ opacity: 0 }}
+        style={{ opacity: 0, pointerEvents: 'none' }}
       >
         <p className="mb-6 text-[10px] font-medium uppercase tracking-[0.4em] text-white/70 md:text-[11px]">
           <span className="inline-block h-px w-8 align-middle bg-white/40 mr-3" />
@@ -859,6 +823,7 @@ export default function HomeExperience() {
             fontSize: 'clamp(2rem, 4vw, 4.5rem)',
             fontWeight: 700,
             letterSpacing: '-0.02em',
+            textShadow: '0 4px 30px rgba(14, 74, 133, 0.6), 0 2px 12px rgba(0, 0, 0, 0.4)',
           }}
         >
           {'What our partners say about working with us.'.split('').map((char, i) => (
@@ -890,27 +855,6 @@ export default function HomeExperience() {
           }}
         />
       ))}
-
-      <style jsx>{`
-        .splash-wordmark {
-          filter: drop-shadow(0 0 30px rgba(125, 200, 255, 0.3))
-            drop-shadow(0 0 60px rgba(80, 150, 220, 0.2));
-        }
-
-        .splash-wordmark .char {
-          background: linear-gradient(
-            180deg,
-            #ffffff 0%,
-            #d6ecff 40%,
-            #7cb8f0 70%,
-            #4f8ed4 100%
-          );
-          -webkit-background-clip: text;
-          background-clip: text;
-          -webkit-text-fill-color: transparent;
-          color: transparent;
-        }
-      `}</style>
     </section>
   )
 }
@@ -999,13 +943,15 @@ function TestimonialCard({
   return (
     <div
       ref={cardRef}
-      className="absolute left-1/2 top-[42%] z-[25] w-[92%] max-w-5xl -translate-x-1/2 overflow-hidden rounded-3xl border border-white/10 px-8 py-12 backdrop-blur-md md:px-14 md:py-16"
+      className="absolute left-1/2 top-[42%] z-[25] w-[92%] max-w-5xl overflow-hidden rounded-3xl border border-white/10 px-8 py-12 backdrop-blur-md md:px-14 md:py-16"
       style={{
+        pointerEvents: 'none',
         background:
           'linear-gradient(145deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)',
         boxShadow:
           '0 30px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.10)',
         opacity: 0,
+        transform: 'translateX(-50%)',
       }}
     >
       <span

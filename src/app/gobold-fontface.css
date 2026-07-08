@@ -1,0 +1,62 @@
+/* ── GOBOLD FONT (add these to your globals.css) ── */
+
+@font-face {
+  font-family: "Gobold";
+  src: url("/fonts/Gobold Thin.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Gobold";
+  src: url("/fonts/Gobold Thin Italic.otf") format("opentype");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Gobold";
+  src: url("/fonts/Gobold Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Gobold";
+  src: url("/fonts/Gobold Regular Italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Gobold";
+  src: url("/fonts/Gobold Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Gobold";
+  src: url("/fonts/Gobold Bold Italic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Gobold Hollow";
+  src: url("/fonts/Gobold Hollow.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Gobold Hollow";
+  src: url("/fonts/Gobold Hollow Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Then add this variable inside your :root { } block: */
+/*   --font-gobold: "Gobold", sans-serif;   */

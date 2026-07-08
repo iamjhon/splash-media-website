@@ -59,15 +59,15 @@ const wordmark = 'We Are Splash Media'
 export default function Footer() {
   return (
     <footer className={styles.footer}>
-      {/* ── SMOOTH WAVE at the top ── */}
+      {/* ── WAVE SEPARATOR at the very top ── */}
       <div className={styles.waveTop} aria-hidden>
-        <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
           <path
-            d="M0,50
-               C180,10 340,5 520,35
-               C680,62 780,85 940,80
-               C1100,75 1260,30 1440,20
-               L1440,90 L0,90 Z"
+            d="M0,38
+               C200,8 360,2 540,28
+               C700,52 800,72 960,66
+               C1120,60 1280,20 1440,12
+               L1440,80 L0,80 Z"
             fill="#1e6fc4"
           />
         </svg>

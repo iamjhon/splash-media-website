@@ -1,0 +1,190 @@
+.wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.list {
+  width: 100%;
+  max-width: 1100px;
+  padding: 0 6vw;
+  display: flex;
+  flex-direction: column;
+}
+
+/* What We Do — eyebrow above Marketing */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+  font-family: var(--font-narrow, sans-serif);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.eyebrowLine {
+  display: inline-block;
+  width: 32px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.visible .eyebrow {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Each service row ── */
+.item {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+
+  /* entrance */
+  opacity: 0;
+  transform: translateX(-60px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--i) * 0.1s);
+}
+
+.visible .item {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Background image (revealed on hover) */
+.itemBg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: scale(1.1);
+  transition: opacity 0.5s ease, transform 0.6s ease;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.item:hover .itemBg,
+.itemBgActive {
+  opacity: 0.85 !important;
+  transform: scale(1) !important;
+}
+
+/* darkening overlay so text stays readable over the image */
+.item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(6, 26, 54, 0.2), rgba(6, 26, 54, 0.6));
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 1;
+}
+.item:hover::after {
+  opacity: 1;
+}
+
+.itemContent {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: clamp(0.5rem, 1.2vw, 1.1rem) 1.5rem;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.item:hover .itemContent {
+  transform: translateX(1rem);
+}
+
+.itemHead {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.index {
+  font-family: var(--font-narrow, sans-serif);
+  font-size: clamp(0.7rem, 1vw, 0.9rem);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.4);
+  transition: color 0.3s ease;
+}
+
+.label {
+  font-family: var(--font-gobold, sans-serif);
+  font-size: clamp(2rem, 6vw, 5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #ffffff;
+  transition: color 0.3s ease;
+}
+
+.arrow {
+  margin-left: auto;
+  font-size: clamp(1.2rem, 2.5vw, 2rem);
+  color: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  transform: translateX(-14px);
+  transition: opacity 0.3s ease, transform 0.3s ease, color 0.3s ease;
+}
+
+.item:hover .arrow {
+  opacity: 1;
+  transform: translateX(0);
+  color: #ffffff;
+}
+
+/* Sub-services row */
+.subRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+}
+
+.sub {
+  font-family: var(--font-body, sans-serif);
+  font-size: clamp(0.75rem, 1vw, 0.95rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.55);
+  transition: color 0.3s ease;
+}
+
+/* Dim non-hovered rows */
+.dimmed .item .label {
+  color: rgba(255, 255, 255, 0.25);
+}
+.dimmed .item .sub {
+  color: rgba(255, 255, 255, 0.18);
+}
+.item:hover .label {
+  color: #ffffff;
+}
+.item:hover .index {
+  color: #5eb8f5;
+}
+.item:hover .sub {
+  color: rgba(255, 255, 255, 0.85);
+}

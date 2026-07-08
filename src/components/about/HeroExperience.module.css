@@ -31,7 +31,7 @@
   height: 100%;
   object-fit: cover;
   z-index: 1;
-
+  opacity: 0.45;
 }
 
 /* Title overlay — centered vertically */
@@ -79,46 +79,72 @@
   text-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
 }
 
-/* Passion content — center stage, fades in after title fades */
+/* Passion content — centered single column */
 .passion {
   position: absolute;
   inset: 0;
   z-index: 3;
+  padding: 9rem 2rem 4rem;
+  opacity: 0;
+  pointer-events: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 2rem;
-  opacity: 0;
-  pointer-events: none;
+}
+
+/* Title block */
+.passionTitleWrap {
+  max-width: 720px;
+  margin-bottom: 1.75rem;
+}
+
+.passionEyebrow {
+  font-family: var(--font-narrow, system-ui), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 1rem;
 }
 
 .passionTitle {
   font-family: var(--font-display, system-ui), sans-serif;
-  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
   font-weight: 700;
-  letter-spacing: 0.05em;
-  line-height: 1.2;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
   text-transform: uppercase;
   color: #fff;
-  margin: 0 0 1.5rem;
-  max-width: 28ch;
-  text-shadow: 0 3px 20px rgba(0, 0, 0, 0.5);
+  margin: 0;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+}
+
+.passionAccent {
+  color: #5eb8f5;
+}
+
+/* Body + CTA */
+.passionBodyWrap {
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
 }
 
 .passionText {
   font-family: var(--font-body, system-ui), sans-serif;
-  font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+  font-size: clamp(0.95rem, 1.05vw, 1.05rem);
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.95);
-  max-width: 58ch;
+  color: rgba(255, 255, 255, 0.92);
   margin: 0;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
 }
 
 .buttonWrap {
-  margin-top: 2rem;
   pointer-events: auto;
 }
 
@@ -132,7 +158,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 2rem;
+  padding: 9rem 2rem 4rem;
   opacity: 0;
   pointer-events: none;
 }
@@ -144,12 +170,22 @@
   max-width: 1000px;
   width: 100%;
   margin-bottom: 2.5rem;
+  padding: 3rem 3.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 1.5rem;
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 @media (max-width: 768px) {
   .missionGrid {
     grid-template-columns: 1fr;
     gap: 2rem;
+    padding: 2rem 1.75rem;
   }
 }
 

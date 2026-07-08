@@ -3,17 +3,16 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import SplashButton from './SplashButton'
 import styles from './Navbar.module.css'
 
 // ─────────────────────────────────────────────
 // NAV STRUCTURE
 // ─────────────────────────────────────────────
-type SubItem = { label: string; href: string; desc?: string }
+type SubItem = { label: string; href: string }
 type NavItem = {
   label: string
   href: string
-  mega?: { heading: string; items: SubItem[] }
+  sub?: SubItem[]
 }
 
 const navItems: NavItem[] = [
@@ -21,63 +20,55 @@ const navItems: NavItem[] = [
   {
     label: 'Services',
     href: '/services',
-    mega: {
-      heading: 'What we do',
-      items: [
-        { label: 'Marketing', href: '/services/marketing', desc: 'TV, radio, social, SEO' },
-        { label: 'Ad Campaigns', href: '/services/ad-campaigns', desc: 'Strategy that converts' },
-        { label: 'Web Development', href: '/services/web-development', desc: 'Sites built to perform' },
-        { label: 'Print', href: '/services/print', desc: 'Tactile brand experiences' },
-      ],
-    },
+    sub: [
+      { label: 'Marketing', href: '/services/marketing' },
+      { label: 'Ad Campaigns', href: '/services/ad-campaigns' },
+      { label: 'Web Development', href: '/services/web-development' },
+      { label: 'Print', href: '/services/print' },
+    ],
   },
   { label: 'Portfolio', href: '/portfolio' },
   {
     label: 'About',
     href: '/about',
-    mega: {
-      heading: 'Who we are',
-      items: [
-        { label: 'Who We Are', href: '/about', desc: 'Our story & mission' },
-        { label: 'Our Team', href: '/about/team', desc: 'The people behind the work' },
-        { label: 'Community Engagement', href: '/about/community', desc: 'Giving back to Utah' },
-      ],
-    },
+    sub: [
+      { label: 'Who We Are', href: '/about' },
+      { label: 'Our Team', href: '/about/team' },
+      { label: 'Community Engagement', href: '/about/community' },
+    ],
   },
   { label: 'Contact', href: '/contact' },
 ]
 
+const socialLinks = [
+  { label: 'Instagram', href: 'https://instagram.com' },
+  { label: 'LinkedIn', href: 'https://linkedin.com' },
+  { label: 'TikTok', href: 'https://tiktok.com' },
+]
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
-  const [openMega, setOpenMega] = useState<string | null>(null)
-  const [mobileOpen, setMobileOpen] = useState(false)
-
-const [hidden, setHidden] = useState(false)
-
-useEffect(() => {
-  const onScroll = () => {
-    const y = window.scrollY
-    const vh = window.innerHeight
-    setScrolled(y > 20)
-    // Hide the navbar once we scroll past ~2.1 viewports (into VideoIntro)
-    setHidden(y > vh * 2.1)
-  }
-  window.addEventListener('scroll', onScroll, { passive: true })
-  return () => window.removeEventListener('scroll', onScroll)
-}, [])
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : ''
+    const onScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
     return () => {
       document.body.style.overflow = ''
     }
-  }, [mobileOpen])
+  }, [menuOpen])
 
   return (
     <>
-      <header className={`${styles.navRoot} ${scrolled ? styles.navScrolled : ''} ${hidden ? styles.navHidden : ''}`}>
+      <header className={`${styles.navRoot} ${scrolled ? styles.navScrolled : ''}`}>
         <div className={styles.navInner}>
-          {/* ─── LOGO ─── */}
+          {/* ─── LOGO (left) ─── */}
           <Link href="/" className={styles.navLogo} aria-label="Splash Media home">
             <Image
               src="/images/logo.png"
@@ -89,111 +80,99 @@ useEffect(() => {
             />
           </Link>
 
-          {/* ─── CENTER NAV (desktop) ─── */}
-          <nav className={styles.navCenter} onMouseLeave={() => setOpenMega(null)}>
-            {navItems.map((item) => (
+          {/* ─── RIGHT: MENU button + Contact icon ─── */}
+          <div className={styles.navRight}>
+            {/* Contact icon button */}
+            <Link href="/contact" className={styles.contactBtn} aria-label="Contact us">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+            </Link>
+
+            {/* MENU toggle button */}
+            <button
+              className={`${styles.menuBtn} ${menuOpen ? styles.menuBtnOpen : ''}`}
+              onClick={() => setMenuOpen((o) => !o)}
+              aria-expanded={menuOpen}
+              aria-label="Toggle menu"
+            >
+              <span className={styles.menuBtnText}>
+                {menuOpen ? 'CLOSE' : 'MENU'}
+              </span>
+              <span className={styles.menuBtnIcon}>
+                <span className={styles.menuLine} />
+                <span className={styles.menuLine} />
+              </span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* ─── FULL OVERLAY MENU ─── */}
+      <div className={`${styles.overlay} ${menuOpen ? styles.overlayOpen : ''}`}>
+        <div className={styles.overlayInner}>
+          <nav className={styles.overlayNav}>
+            {navItems.map((item, i) => (
               <div
                 key={item.label}
-                className={styles.navItemWrap}
-                onMouseEnter={() => setOpenMega(item.mega ? item.label : null)}
+                className={styles.overlayGroup}
+                style={{ '--i': i } as React.CSSProperties}
               >
-                <Link href={item.href} className={styles.navLink}>
+                <Link
+                  href={item.href}
+                  className={styles.overlayLink}
+                  onClick={() => setMenuOpen(false)}
+                >
                   {item.label}
-                  {item.mega && (
-                    <span
-                      className={`${styles.navCaret} ${
-                        openMega === item.label ? styles.navCaretOpen : ''
-                      }`}
-                    >
-                      ▾
-                    </span>
-                  )}
                 </Link>
-
-                {/* MEGA MENU */}
-                {item.mega && (
-                  <div
-                    className={`${styles.mega} ${
-                      openMega === item.label ? styles.megaOpen : ''
-                    }`}
-                  >
-                    <div className={styles.megaPanel}>
-                      <p className={styles.megaHeading}>{item.mega.heading}</p>
-                      <div className={styles.megaGrid}>
-                        {item.mega.items.map((sub) => (
-                          <Link key={sub.label} href={sub.href} className={styles.megaItem}>
-                            <span className={styles.megaItemLabel}>{sub.label}</span>
-                            {sub.desc && <span className={styles.megaItemDesc}>{sub.desc}</span>}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
+                {item.sub && (
+                  <div className={styles.overlaySub}>
+                    {item.sub.map((s) => (
+                      <Link
+                        key={s.label}
+                        href={s.href}
+                        className={styles.overlaySublink}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        {s.label}
+                      </Link>
+                    ))}
                   </div>
                 )}
               </div>
             ))}
           </nav>
 
-          {/* ─── RIGHT: CTA BUTTON (desktop) ─── */}
-          <div className={styles.navCta}>
-            <SplashButton color="neutral" size="md" href="/contact">
-              Free Consultation
-            </SplashButton>
-          </div>
-
-          {/* ─── MOBILE HAMBURGER ─── */}
-          <button
-            className={styles.navBurger}
-            aria-label="Toggle menu"
-            onClick={() => setMobileOpen((o) => !o)}
-          >
-            <span
-              className={`${styles.burgerLine} ${mobileOpen ? styles.burgerLine1Open : ''}`}
-            />
-            <span
-              className={`${styles.burgerLine} ${mobileOpen ? styles.burgerLine2Open : ''}`}
-            />
-            <span
-              className={`${styles.burgerLine} ${mobileOpen ? styles.burgerLine3Open : ''}`}
-            />
-          </button>
-        </div>
-      </header>
-
-      {/* ─── MOBILE DRAWER ─── */}
-      <div className={`${styles.mobileDrawer} ${mobileOpen ? styles.mobileDrawerOpen : ''}`}>
-        <nav className={styles.mobileNav}>
-          {navItems.map((item) => (
-            <div key={item.label} className={styles.mobileGroup}>
-              <Link
-                href={item.href}
-                className={styles.mobileLink}
-                onClick={() => setMobileOpen(false)}
-              >
-                {item.label}
-              </Link>
-              {item.mega && (
-                <div className={styles.mobileSub}>
-                  {item.mega.items.map((sub) => (
-                    <Link
-                      key={sub.label}
-                      href={sub.href}
-                      className={styles.mobileSublink}
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      {sub.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
+          {/* Footer: email + socials */}
+          <div className={styles.overlayFooter}>
+            <a href="mailto:hello@splashmedia.com" className={styles.overlayEmail}>
+              hello@splashmedia.com
+            </a>
+            <div className={styles.overlaySocials}>
+              {socialLinks.map((s) => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.overlaySocialLink}
+                >
+                  {s.label}
+                </a>
+              ))}
             </div>
-          ))}
-          <div className={styles.mobileCta}>
-            <SplashButton color="neutral" size="md" href="/contact" fullWidth>
-              Free Consultation
-            </SplashButton>
           </div>
-        </nav>
+        </div>
       </div>
     </>
   )

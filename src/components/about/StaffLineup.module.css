@@ -1,0 +1,127 @@
+.section {
+  position: relative;
+  width: 100%;
+  background: #0e4a85;
+  overflow: hidden;
+}
+
+/* The lineup row — edge to edge, no gaps */
+.lineup {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  width: 100%;
+  gap: 0;
+}
+
+/* Individual card */
+.card {
+  position: relative;
+  aspect-ratio: 3 / 5;
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  transform: translateY(60px);
+  opacity: 0;
+  transition:
+    transform 1s cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0s),
+    opacity 1s ease var(--delay, 0s);
+  isolation: isolate;
+}
+
+.imageWrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.image {
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Hover grow effect on the IMAGE — image zooms within its container */
+.card:hover .image {
+  transform: scale(1.08);
+}
+
+/* Hover overlay — dark gradient + text */
+.hoverOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    180deg,
+    rgba(14, 74, 133, 0) 50%,
+    rgba(14, 74, 133, 0.85) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+}
+
+.card:hover .hoverOverlay {
+  opacity: 1;
+}
+
+.hoverContent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transform: translateY(20px);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card:hover .hoverContent {
+  transform: translateY(0);
+}
+
+.hoverLabel {
+  font-family: var(--font-narrow, system-ui), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+.hoverArrow {
+  font-size: 1rem;
+  color: #5eb8f5;
+  transform: translateX(-8px);
+  opacity: 0;
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s,
+    opacity 0.4s ease 0.1s;
+}
+
+.card:hover .hoverArrow {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* ── Reveal state ── */
+.section.visible .card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+  .lineup {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 540px) {
+  .lineup {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

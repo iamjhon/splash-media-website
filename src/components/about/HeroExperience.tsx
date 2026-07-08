@@ -9,6 +9,8 @@ export default function HeroExperience() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const titleRef = useRef<HTMLDivElement>(null)
   const passionRef = useRef<HTMLDivElement>(null)
+  const passionTitleRef = useRef<HTMLDivElement>(null)
+  const passionBodyRef = useRef<HTMLDivElement>(null)
   const missionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -101,18 +103,31 @@ export default function HeroExperience() {
           titleRef.current.style.transform = `scale(${scale})`
         }
 
-        // ── PASSION: slides up from bottom, then shrinks out ──
+        // ── PASSION: title and body slide in together, then exit in different directions ──
         if (passionRef.current) {
-          // Slide in: 0.18 → 0.28 (from 100% below to 0)
+          // Slide in: 0.18 → 0.28
           const slideIn = ramp(p, 0.18, 0.28)
-          // Shrink out: 0.40 → 0.50
-          const shrinkOut = ramp(p, 0.40, 0.50)
-          const scale = 1 - shrinkOut * 0.7
-          const slideY = (1 - slideIn) * 100 // from 100% below
-          const o = shrinkOut >= 1 ? 0 : slideIn
+          // Exit: 0.40 → 0.50
+          const exit = ramp(p, 0.40, 0.50)
+
+          // Container handles initial slide-in
+          const slideY = (1 - slideIn) * 100
+          const o = exit >= 1 ? 0 : slideIn
           passionRef.current.style.opacity = String(o)
-          passionRef.current.style.transform = `translateY(${slideY}%) scale(${scale})`
-          passionRef.current.style.pointerEvents = o > 0.5 && shrinkOut < 0.5 ? 'auto' : 'none'
+          passionRef.current.style.transform = `translateY(${slideY}%)`
+          passionRef.current.style.pointerEvents = o > 0.5 && exit < 0.5 ? 'auto' : 'none'
+
+          // Title exits UP
+          if (passionTitleRef.current) {
+            const exitY = exit * -120
+            passionTitleRef.current.style.transform = `translateY(${exitY}%)`
+          }
+
+          // Body + button exits UP
+          if (passionBodyRef.current) {
+            const exitY = exit * -120
+            passionBodyRef.current.style.transform = `translateY(${exitY}%)`
+          }
         }
 
         // ── MISSION: slides up from bottom into final spot ──
@@ -157,22 +172,28 @@ export default function HeroExperience() {
           <h1 className={styles.titleBig}>About Us</h1>
         </div>
 
-        {/* Passion content — fades in after title fades */}
+        {/* Passion content — Blackbird-style layout: title top-left, body+CTA bottom-right */}
         <div ref={passionRef} className={styles.passion}>
-          <h2 className={styles.passionTitle}>
-            Splash Media: Driven by Passion, Dedication, and Diligence.
-          </h2>
-          <p className={styles.passionText}>
-            Our foundation is built on a deep-seated passion for marketing,
-            unwavering commitment to our craft, and relentless hard work. We
-            believe in going the extra mile — not just to meet, but to exceed
-            expectations. Our team pours its heart and soul into every project,
-            big or small, ensuring we deliver results and excellence.
-          </p>
-          <div className={styles.buttonWrap}>
-            <SplashButton color="neutral" size="md" href="/contact">
-              Schedule a Consultation
-            </SplashButton>
+          <div ref={passionTitleRef} className={styles.passionTitleWrap}>
+            <p className={styles.passionEyebrow}>02 / Who We Are</p>
+            <h2 className={styles.passionTitle}>
+              Driven by <span className={styles.passionAccent}>passion</span>,
+              dedication, and diligence.
+            </h2>
+          </div>
+
+          <div ref={passionBodyRef} className={styles.passionBodyWrap}>
+            <p className={styles.passionText}>
+              Our foundation is built on a deep-seated passion for marketing,
+              unwavering commitment to our craft, and relentless hard work. We
+              believe in going the extra mile — not just to meet, but to exceed
+              expectations.
+            </p>
+            <div className={styles.buttonWrap}>
+              <SplashButton color="neutral" size="md" href="/contact">
+                Schedule a Consultation
+              </SplashButton>
+            </div>
           </div>
         </div>
 

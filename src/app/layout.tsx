@@ -31,6 +31,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/luy1uie.css" />
+
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

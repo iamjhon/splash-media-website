@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import FloatingDrops from './FloatingDrops'
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger)
@@ -25,7 +26,7 @@ const testimonials: Testimonial[] = [
     name: 'Thurl Bailey',
     role: 'NBA Champion · Salt Lake Legend',
     initials: 'TB',
-    accent: '#60a5fa', // matches electric blue morph
+    accent: '#60a5fa',
   },
   {
     index: '02',
@@ -34,7 +35,7 @@ const testimonials: Testimonial[] = [
     name: 'Marlene Gonzalez',
     role: 'Attorney',
     initials: 'MG',
-    accent: '#f472b6', // matches deep magenta morph
+    accent: '#f472b6',
   },
   {
     index: '03',
@@ -43,12 +44,12 @@ const testimonials: Testimonial[] = [
     name: 'GFCBW Utah',
     role: 'Chinese Business Women Global Federation',
     initials: 'GF',
-    accent: '#2dd4bf', // matches teal morph
+    accent: '#2dd4bf',
   },
 ]
 
 // ─────────────────────────────────────────────
-// HEADER WITH CHAR REVEAL
+// HEADER WITH CHAR REVEAL — now sticky inside section
 // ─────────────────────────────────────────────
 const HEADING_TEXT = 'What our partners say about working with us.'
 
@@ -80,7 +81,16 @@ const TestimonialsHeader = () => {
   }, [])
 
   return (
-    <div ref={headerRef} className="mx-auto max-w-5xl px-6 pt-32 pb-20 text-center md:pt-40 md:pb-24">
+    <div
+      ref={headerRef}
+      className="mx-auto max-w-5xl px-6 pt-32 pb-20 text-center md:pt-40 md:pb-24"
+      style={{
+        position: 'sticky',
+        top: '5rem',
+        zIndex: 2,
+        pointerEvents: 'none',
+      }}
+    >
       <p className="mb-6 text-[10px] font-medium uppercase tracking-[0.4em] text-white/60 md:text-[11px]">
         <span className="inline-block h-px w-8 align-middle bg-white/40 mr-3" />
         Testimonials
@@ -93,6 +103,7 @@ const TestimonialsHeader = () => {
           fontSize: 'clamp(2.5rem, 5vw, 5.5rem)',
           fontWeight: 700,
           letterSpacing: '-0.02em',
+          textShadow: '0 4px 30px rgba(14, 74, 133, 0.5)',
         }}
       >
         {HEADING_TEXT.split('').map((char, i) => (
@@ -133,9 +144,11 @@ const TestimonialCard = ({
       className="relative mx-auto mb-32 w-full max-w-5xl overflow-hidden rounded-3xl border border-white/10 px-8 py-12 backdrop-blur-md md:px-14 md:py-16"
       style={{
         background:
-          'linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)',
+          'linear-gradient(145deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)',
         boxShadow:
-          '0 30px 80px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)',
+          '0 30px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.10)',
+        position: 'relative',
+        zIndex: 3,
       }}
     >
       {/* Massive index number behind */}
@@ -266,15 +279,19 @@ export default function Testimonials() {
     <section
       ref={sectionRef}
       className="relative w-full pb-32 md:pb-40"
-      style={{ background: 'transparent' }}
+      style={{ background: 'transparent', overflow: 'hidden' }}
     >
+      {/* Floating 3D water drops in background */}
+      <FloatingDrops />
+
+      {/* Sticky header — stays visible while cards scroll past */}
       <TestimonialsHeader />
 
-      <div className="px-4 md:px-6">
+      <div className="px-4 md:px-6" style={{ position: 'relative', zIndex: 3 }}>
         <TestimonialCard testimonial={testimonials[0]} total={testimonials.length} cardRef={card1Ref} />
         <TestimonialCard testimonial={testimonials[1]} total={testimonials.length} cardRef={card2Ref} />
         <TestimonialCard testimonial={testimonials[2]} total={testimonials.length} cardRef={card3Ref} />
       </div>
     </section>
   )
-}
+} 

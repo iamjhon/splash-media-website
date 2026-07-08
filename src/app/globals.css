@@ -1,58 +1,18 @@
 @import "tailwindcss";
 
 /* ════════════════════════════════════════════════════════
-   SIZE-ADJUSTED FALLBACK FONTS
-   These match the metrics of the Obviously web fonts so that
-   when Typekit swaps the real font in, there's no layout shift.
+   SIZE-ADJUSTED FALLBACK FONT
+   Matches the metrics of Neulis Neue so that when Typekit
+   swaps the real font in, there's minimal layout shift.
    Tune the percentages by comparing fallback vs real font.
    ════════════════════════════════════════════════════════ */
-
-/* Fallback for Obviously Condensed (the giant SPLASH MEDIA wordmark).
-   Condensed = narrow glyphs, so we use a narrow base + reduce size-adjust. */
 @font-face {
-  font-family: "Obviously-Condensed-Fallback";
-  src: local("Arial Narrow Bold"), local("Arial Narrow"), local("Arial");
-  font-weight: 700;
-  font-style: normal;
-  size-adjust: 80%;
-  ascent-override: 90%;
-  descent-override: 22%;
-  line-gap-override: 0%;
-}
-
-/* Fallback for Obviously Extended (service card titles).
-   Extended = wide glyphs, so we increase size-adjust. */
-@font-face {
-  font-family: "Obviously-Extended-Fallback";
-  src: local("Arial Black"), local("Arial Bold"), local("Arial");
-  font-weight: 700;
-  font-style: normal;
-  size-adjust: 118%;
-  ascent-override: 88%;
-  descent-override: 22%;
-  line-gap-override: 0%;
-}
-
-/* Fallback for regular Obviously (body, headings). */
-@font-face {
-  font-family: "Obviously-Regular-Fallback";
-  src: local("Arial"), local("Helvetica");
-  font-weight: 400 700;
+  font-family: "Neulis-Fallback";
+  src: local("Helvetica Neue"), local("Helvetica"), local("Arial");
+  font-weight: 100 700;
   font-style: normal;
   size-adjust: 100%;
-  ascent-override: 92%;
-  descent-override: 24%;
-  line-gap-override: 0%;
-}
-
-/* Fallback for Obviously Narrow (eyebrow labels, taglines). */
-@font-face {
-  font-family: "Obviously-Narrow-Fallback";
-  src: local("Arial Narrow"), local("Arial");
-  font-weight: 400 700;
-  font-style: normal;
-  size-adjust: 88%;
-  ascent-override: 92%;
+  ascent-override: 95%;
   descent-override: 24%;
   line-gap-override: 0%;
 }
@@ -60,25 +20,31 @@
 :root {
   --background: #061a36;
   --foreground: #ededed;
+  --font-gobold: "Gobold", sans-serif;
+  --font-gobold-hollow: "Gobold Hollow", sans-serif;
+  
 
-  /* ── Splash Media font system ──
-     Each web font now has its size-adjusted fallback right after it,
-     so the fallback occupies near-identical space until Typekit loads. */
+  /* ── Splash Media font system — now all Neulis Neue ──
+     Display/heading/body all use neulis-neue (weight 700 for display
+     impact, 400 for body). Hairline available for ultra-thin accents. */
 
-  /* Display: massive wordmarks, headings (Extended for max impact) */
-  --font-display: "obviously-extended", "Obviously-Extended-Fallback", sans-serif;
+  /* Display: massive wordmarks, headings */
+  --font-display: "neulis-neue", "Neulis-Fallback", sans-serif;
 
   /* Headings: section titles, service names */
-  --font-heading: "obviously", "Obviously-Regular-Fallback", sans-serif;
+  --font-heading: "neulis-neue", "Neulis-Fallback", sans-serif;
 
-  /* Narrow: condensed labels, eyebrow text, taglines */
-  --font-narrow: "obviously-narrow", "Obviously-Narrow-Fallback", sans-serif;
+  /* Narrow: eyebrow text, labels, taglines */
+  --font-narrow: "neulis-neue", "Neulis-Fallback", sans-serif;
 
   /* Body: regular reading copy */
-  --font-body: "obviously", "Obviously-Regular-Fallback", sans-serif;
+  --font-body: "neulis-neue", "Neulis-Fallback", sans-serif;
 
-  /* Condensed: the giant SPLASH MEDIA wordmark */
-  --font-condensed: "obviously-condensed", "Obviously-Condensed-Fallback", sans-serif;
+  /* Condensed alias kept for any components still referencing it */
+  --font-condensed: "neulis-neue", "Neulis-Fallback", sans-serif;
+
+  /* Hairline: ultra-thin weight-100 accents if you want them */
+  --font-hairline: "neulis-neue-hairline", "Neulis-Fallback", sans-serif;
 }
 
 @theme inline {
@@ -95,5 +61,12 @@ html {
 body {
   background: #061a36;
   color: var(--foreground);
-  font-family: "obviously", "Obviously-Regular-Fallback", sans-serif;
+  font-family: "neulis-neue", "Neulis-Fallback", sans-serif;
+}
+
+@keyframes scrollLine {
+  0%   { transform: scaleY(0); transform-origin: top; opacity: 0; }
+  40%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
+  60%  { transform: scaleY(1); transform-origin: bottom; opacity: 1; }
+  100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
 }
